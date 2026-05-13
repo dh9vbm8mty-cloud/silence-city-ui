@@ -1369,14 +1369,6 @@ export default function SilenceCityPage() {
                 Auto-submit is {autoSubmitOnResolve ? "enabled" : "disabled"}. {playtestRecord.length} records saved · {submittedSnapshots.length} submitted snapshots.
               </p>
             </div>
-
-              <button
-                type="button"
-                onClick={() => setShowModeratorData((previous) => !previous)}
-                className="rounded-2xl border bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
-              >
-                {showModeratorData ? "Hide backend data" : "Show backend data"}
-              </button>
             </div>
 
             {showModeratorData && (
