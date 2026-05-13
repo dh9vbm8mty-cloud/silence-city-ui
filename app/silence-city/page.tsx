@@ -1070,90 +1070,6 @@ export default function SilenceCityPage() {
                 <p className="text-sm font-bold uppercase tracking-wide text-slate-700">District Brief</p>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">Today&apos;s Priority: {civicPriority}</h2>
                 <p className="mt-2 text-sm text-slate-600">{civicPriorityReason}</p>
-
-                <div className="mt-4 rounded-2xl border bg-slate-50 p-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Route Gate Goal</p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">Open the Route Gate by Day 14.</p>
-                    </div>
-                    <span className={`rounded-full border px-3 py-1 text-xs font-bold ${visibleRouteGatePassedCount === visibleRouteGateChecks.length ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700"}`}>
-                      {visibleRouteGatePassedCount} of {visibleRouteGateChecks.length} requirements met
-                    </span>
-                  </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
-                    <div
-                      className={`h-full rounded-full ${visibleRouteGatePassedCount === visibleRouteGateChecks.length ? "bg-emerald-500" : "bg-amber-400"}`}
-                      style={{ width: `${visibleRouteGateProgress}%` }}
-                    />
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-                    {visibleRouteGateChecks.map((item) => (
-                      <span
-                        key={item.label}
-                        className={`rounded-full border px-2.5 py-1 ${item.passed ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}
-                      >
-                        {item.label}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-2 text-xs text-slate-500">Stabilize core systems, gather public resources, and build enough civic readiness before the cycle ends.</p>
-                </div>
-
-                <div className="mt-4 rounded-2xl border bg-slate-50 p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Current Pressure</p>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                    {districtPressure.slice(0, 3).map((item) => (
-                      <span key={item} className={`rounded-full border bg-white px-3 py-1 ${getOutcomeChangeTextClass(item)}`}>
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-3 rounded-2xl border bg-slate-50 p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">District Status</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {districtStatRows.map(([label, value]) => (
-                      <span key={label} className="inline-flex items-center gap-2 rounded-2xl border bg-white px-4 py-2 text-slate-600">
-                        <span className="text-xs">{label}</span>
-                        <strong className={`text-lg leading-6 ${getDistrictStatusTextClass(label, value)}`}>{value}/100</strong>
-                        <span className="text-xs text-slate-400">
-                          {label === "Power" ? "Stable ≥35 · Emergency <30" : label === "Infrastructure" ? "Functional ≥35" : label === "Security" ? "Manageable ≥35" : "Stable ≥55"}
-                        </span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-3 rounded-2xl border bg-slate-50 p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Daily System Decay</p>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                    {(Object.entries(dailyDecay) as Array<[keyof DistrictStats, number]>).map(([label, value]) => (
-                      <span key={label} className="inline-flex items-center gap-2 rounded-2xl border bg-white px-3 py-2 text-slate-600">
-                        <span>{label}</span>
-                        <strong className="text-slate-900">{value}</strong>
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-2 text-xs text-slate-500">Applied whenever the day ends, after the selected action is resolved.</p>
-                </div>
-
-                <div className="mt-3 rounded-2xl border bg-slate-50 p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Public Resources</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {publicStorageRows.map(([label, value]) => (
-                      <span key={label} className="inline-flex items-center gap-2 rounded-2xl border bg-white px-4 py-2 text-slate-600">
-                        <span className="text-xs">{label}</span>
-                        <strong className="text-lg leading-6 text-slate-900">{value}</strong>
-                      </span>
-                    ))}
-                    <span className="inline-flex items-center gap-2 rounded-2xl border bg-white px-4 py-2 text-slate-600">
-                      <span className="text-xs">Treasury</span>
-                      <strong className="text-lg leading-6 text-slate-900">{treasury}</strong>
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
           </section>
@@ -1179,10 +1095,10 @@ export default function SilenceCityPage() {
                   </div>
 
                   <div className="rounded-2xl border bg-slate-50 p-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Campaign Day</p>
-                    <p className="mt-1 text-base font-bold text-slate-900">Day {day} / 14</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Route Gate Readiness</p>
+                    <p className="mt-1 text-base font-bold text-slate-900">{visibleRouteGatePassedCount} / {visibleRouteGateChecks.length} ready</p>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
-                      <div className="h-full rounded-full bg-slate-900" style={{ width: `${dayProgress}%` }} />
+                      <div className={`h-full rounded-full ${visibleRouteGatePassedCount === visibleRouteGateChecks.length ? "bg-emerald-500" : "bg-amber-400"}`} style={{ width: `${visibleRouteGateProgress}%` }} />
                     </div>
                   </div>
                 </div>
