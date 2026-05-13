@@ -370,6 +370,18 @@ export default function SilenceCityPage() {
   const dayProgress = Math.round((day / 14) * 100);
   const selectedActionEffectPreview = getActionEffectPreview(action);
   const proposalStatus = resolved ? "Resolved" : submitted ? "Submitted" : "Draft";
+  const currentStepText = resolved
+    ? "Start the next proposal"
+    : submitted
+      ? "End the day"
+      : "Submit your proposal";
+
+  const currentStepDetail = resolved
+    ? "The district has moved forward. Start a new proposal for the current day."
+    : submitted
+      ? "Your proposal is submitted. End the day to make it permanent."
+      : "Choose a role and action, then submit the proposal to council.";
+
   const districtStatRows = Object.entries(districtStats) as Array<[keyof DistrictStats, number]>;
   const publicStorageRows = Object.entries(publicStorage) as Array<[keyof PublicStorage, number]>;
   const districtPressure = getDistrictPressure(districtStats, publicStorage, treasury);
@@ -493,7 +505,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.0.0",
+    version: "1.1.0",
     sessionId,
     playerCode,
     playtestGroup,
@@ -964,7 +976,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.0.0
+            Silence City — District Council Interface v1.1.0
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1149,6 +1161,34 @@ export default function SilenceCityPage() {
 
         {viewMode === "player" && (
           <section className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
+            <div className="mb-4 rounded-3xl border bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Mission</p>
+                  <h2 className="mt-1 text-2xl font-bold text-slate-950">Open the Route Gate by Day 14</h2>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Route Gate: {visibleRouteGatePassedCount} of {visibleRouteGateChecks.length} requirements met
+                  </p>
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[360px]">
+                  <div className="rounded-2xl border bg-slate-50 p-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Current Step</p>
+                    <p className="mt-1 text-base font-bold text-slate-900">{currentStepText}</p>
+                    <p className="mt-1 text-xs text-slate-500">{currentStepDetail}</p>
+                  </div>
+
+                  <div className="rounded-2xl border bg-slate-50 p-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Campaign Day</p>
+                    <p className="mt-1 text-base font-bold text-slate-900">Day {day} / 14</p>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                      <div className="h-full rounded-full bg-slate-900" style={{ width: `${dayProgress}%` }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <p className="text-xs font-bold uppercase tracking-wide text-slate-700">Day Flow</p>
             <div className="mt-2 grid gap-2 md:grid-cols-4">
               {[
