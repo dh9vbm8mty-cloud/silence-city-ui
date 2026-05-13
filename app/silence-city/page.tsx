@@ -505,7 +505,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.1.0",
+    version: "1.1.1",
     sessionId,
     playerCode,
     playtestGroup,
@@ -976,7 +976,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.1.0
+            Silence City — District Council Interface v1.1.1
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1189,13 +1189,13 @@ export default function SilenceCityPage() {
               </div>
             </div>
 
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-700">Day Flow</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-700">How Today Works</p>
             <div className="mt-2 grid gap-2 md:grid-cols-4">
               {[
-                { step: "1", label: "Choose Acting Role", detail: role },
-                { step: "2", label: "Make Proposal", detail: action },
-                { step: "3", label: "Resolve Outcome", detail: submitted ? proposalStatus : "Submit first" },
-                { step: "4", label: "Read Report", detail: resolved ? `Day ${lastResolvedDay}` : "After resolve" },
+                { step: "1", label: "Choose Role", detail: role },
+                { step: "2", label: "Propose Action", detail: action },
+                { step: "3", label: "End Day", detail: submitted ? proposalStatus : "Submit first" },
+                { step: "4", label: "Read Outcome", detail: resolved ? `Day ${lastResolvedDay}` : "After End Day" },
               ].map((item) => (
                 <div key={item.step} className="rounded-2xl border bg-slate-50 p-3 text-sm">
                   <div className="flex items-center gap-2">
@@ -1207,7 +1207,7 @@ export default function SilenceCityPage() {
               ))}
             </div>
             <p className="mt-3 text-xs text-slate-500">
-              You are not solving a quest list. You are helping the district decide what matters first.
+              Each day, choose one role, propose one action, end the day, then read what changed.
             </p>
           </section>
         )}
