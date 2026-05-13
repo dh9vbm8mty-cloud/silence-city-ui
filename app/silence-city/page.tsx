@@ -969,12 +969,9 @@ export default function SilenceCityPage() {
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
             <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setViewMode(viewMode === "player" ? "moderator" : "player")}
-                className="rounded-2xl border bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                {viewMode === "player" ? "Switch to Moderator View" : "Switch to Player View"}
-              </button>
+              <span className="rounded-2xl border bg-white px-4 py-2 text-sm font-semibold text-slate-600">
+                Player View
+              </span>
               <button
                 onClick={resetScenario}
                 className="rounded-2xl border bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
