@@ -505,7 +505,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.2.0",
+    version: "1.2.1",
     sessionId,
     playerCode,
     playtestGroup,
@@ -976,7 +976,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.2.0
+            Silence City — District Council Interface v1.2.1
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1017,17 +1017,7 @@ export default function SilenceCityPage() {
           </p>
         </header>
 
-        <section className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <span className="font-bold text-slate-700">Today&apos;s Command Line</span>
-            <span className="text-slate-600">Day: <strong className="text-slate-900">{day}/14</strong></span>
-            <span className="text-slate-600">Priority: <strong className="text-slate-900">{civicPriority}</strong></span>
-            <span className="text-slate-600">Civic Role: <strong className="text-slate-900">{role}</strong></span>
-            <span className="text-slate-600">Proposal: <strong className="text-slate-900">{action}</strong></span>
-            <span className="text-slate-600">Status: <strong className="text-slate-900">{proposalStatus}</strong></span>
-            <span className="text-slate-600">Fit: <strong className="text-slate-900">{proposalFit}</strong></span>
-          </div>
-        </section>
+        
 
         {viewMode === "player" && (
           <section className="rounded-3xl border bg-white p-4 shadow-sm">
@@ -1057,36 +1047,7 @@ export default function SilenceCityPage() {
           </section>
         )}
 
-        {viewMode === "player" && (
-          <section className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
-            <div className="grid gap-3 md:grid-cols-3">
-              <label className="text-xs font-bold uppercase tracking-wide text-slate-700">
-                Player Code
-                <input
-                  value={playerCode}
-                  onChange={(event) => setPlayerCode(event.target.value)}
-                  className="mt-1 w-full rounded-xl border bg-slate-50 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-900"
-                />
-              </label>
-
-              <label className="text-xs font-bold uppercase tracking-wide text-slate-700">
-                Playtest Group
-                <input
-                  value={playtestGroup}
-                  onChange={(event) => setPlaytestGroup(event.target.value)}
-                  className="mt-1 w-full rounded-xl border bg-slate-50 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-900"
-                />
-              </label>
-
-              <div className="text-xs font-bold uppercase tracking-wide text-slate-700">
-                Session ID
-                <p className="mt-1 rounded-xl border bg-slate-50 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-900">
-                  {sessionId}
-                </p>
-              </div>
-            </div>
-          </section>
-        )}
+        
 
 
 
