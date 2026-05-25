@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.10";
+const version = "3.0.11";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -64,8 +64,8 @@ const startingDistricts: District[] = [
     detail: "The city still has power, but repeated surges are weakening the recovery network.",
     recommendedRoles: ["Engineering", "Logistics", "AI Systems"],
     actions: ["Stabilize Relay Grid", "Inspect Power Lines", "Route Spare Cells"],
-    x: 18,
-    y: 50,
+    x: 20,
+    y: 45,
     points: "10,38 28,34 34,49 25,60 9,56",
   },
   {
@@ -77,8 +77,8 @@ const startingDistricts: District[] = [
     detail: "Materials are moving through the ruins, but citizens do not agree on fair exchange rules.",
     recommendedRoles: ["Merchant", "Negotiation", "Security"],
     actions: ["Open Civic Market", "Broker Supply Deal", "Set Exchange Rules"],
-    x: 82,
-    y: 22,
+    x: 66,
+    y: 20,
     points: "22,17 43,13 48,29 34,38 18,31",
   },
   {
@@ -90,8 +90,8 @@ const startingDistricts: District[] = [
     detail: "Broken records and missing fragments prevent the district from proving what it has rebuilt.",
     recommendedRoles: ["Archivist", "AI Systems", "Exploration"],
     actions: ["Recover Data Fragment", "Index Broken Records", "Restore Civic Memory"],
-    x: 18,
-    y: 22,
+    x: 24,
+    y: 20,
     points: "48,10 69,12 75,28 62,38 47,29",
   },
   {
@@ -103,8 +103,8 @@ const startingDistricts: District[] = [
     detail: "The AI can coordinate recovery, but it will not approve risky operations without clearer civic signals.",
     recommendedRoles: ["AI Systems", "Planner", "Archivist"],
     actions: ["Run Diagnostic", "Optimize Civic Queue", "Verify Gate Logic"],
-    x: 50,
-    y: 22,
+    x: 48,
+    y: 45,
     points: "38,36 55,31 68,43 62,59 45,60 34,48",
   },
   {
@@ -116,8 +116,8 @@ const startingDistricts: District[] = [
     detail: "The medical shelter is functioning, but a serious event could exhaust staff and volunteers.",
     recommendedRoles: ["Medicine", "Logistics", "Negotiation"],
     actions: ["Prepare Triage", "Move Medical Supplies", "Recruit Volunteers"],
-    x: 82,
-    y: 50,
+    x: 80,
+    y: 70,
     points: "72,30 91,34 94,51 80,61 66,50",
   },
   {
@@ -129,8 +129,8 @@ const startingDistricts: District[] = [
     detail: "Tools, scrap, and skilled hands are present, but production still lacks coordination.",
     recommendedRoles: ["Engineering", "Logistics", "Planner"],
     actions: ["Fabricate Structural Part", "Repair Tools", "Organize Work Crews"],
-    x: 18,
-    y: 78,
+    x: 24,
+    y: 70,
     points: "15,62 36,58 43,74 30,88 12,79",
   },
   {
@@ -142,8 +142,8 @@ const startingDistricts: District[] = [
     detail: "Crates, spare cells, and components are scattered through storage without a reliable inventory.",
     recommendedRoles: ["Logistics", "Exploration", "Merchant"],
     actions: ["Catalog Supplies", "Safe Salvage", "Move Public Stock"],
-    x: 50,
-    y: 78,
+    x: 52,
+    y: 70,
     points: "40,62 60,60 70,75 56,89 38,80",
   },
   {
@@ -155,8 +155,8 @@ const startingDistricts: District[] = [
     detail: "Residents will support recovery if missions show visible progress and reduce daily uncertainty.",
     recommendedRoles: ["Negotiation", "Medicine", "Security"],
     actions: ["Hold Civic Meeting", "Check Resident Needs", "Stabilize Patrol Routes"],
-    x: 82,
-    y: 78,
+    x: 48,
+    y: 88,
     points: "68,58 92,55 96,75 81,89 66,75",
   },
   {
@@ -168,8 +168,8 @@ const startingDistricts: District[] = [
     detail: "Opening the gate requires power stability, public supplies, verified records, and coordinated approval.",
     recommendedRoles: ["Planner", "Engineering", "AI Systems"],
     actions: ["Inspect Gate", "Prioritize Gate Readiness", "Draft Opening Plan"],
-    x: 50,
-    y: 50,
+    x: 80,
+    y: 45,
     points: "39,84 61,84 72,97 28,97",
   },
 ];
