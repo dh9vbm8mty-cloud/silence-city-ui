@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.1.0";
+const version = "3.1.3";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -383,6 +383,7 @@ export default function SilenceCityMapPage() {
   const [selectedRole, setSelectedRole] = useState("Archivist");
   const [selectedAction, setSelectedAction] = useState("Recover Data Fragment");
   const [submitted, setSubmitted] = useState(false);
+  const [showOpeningBrief, setShowOpeningBrief] = useState(true);
   const [routeGateOpened, setRouteGateOpened] = useState(false);
   const [resources, setResources] = useState<CityResources>(startingResources);
   const [lastDelta, setLastDelta] = useState<ResourceDelta>({});
@@ -575,8 +576,72 @@ export default function SilenceCityMapPage() {
           ? "Strained but recoverable. A mission can stabilize this area."
           : "Stable area. Useful for preparation and long-term readiness.";
 
+  if (showOpeningBrief) {
+    return (
+      <main data-screen="opening-brief" className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-4xl items-center justify-center">
+          <section className="w-full rounded-3xl border border-slate-700/80 bg-slate-900 p-6 shadow-2xl">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-sky-300">Silence City</p>
+            <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-5xl">
+              The city survived the collapse. Society did not.
+            </h1>
+
+            <div className="mt-5 space-y-3 text-sm leading-7 text-slate-300 sm:text-base">
+              <p>Power is unstable. Records are fragmented. Supplies are limited. Trust is thin.</p>
+              <p>
+                You are a civic coordinator trying to restore enough shared systems for the city to act together again.
+              </p>
+              <p>
+                In 14 days, the Route Gate must open. Not to escape — but to prove Silence City is organized enough to reconnect with the outside route.
+              </p>
+            </div>
+
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              <div className="rounded-2xl border border-slate-700/70 bg-slate-950/50 p-3">
+                <p className="text-xs font-black uppercase tracking-wide text-slate-400">Power</p>
+                <p className="mt-1 text-sm text-slate-300">City systems can still function.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-700/70 bg-slate-950/50 p-3">
+                <p className="text-xs font-black uppercase tracking-wide text-slate-400">Supplies</p>
+                <p className="mt-1 text-sm text-slate-300">People can survive another day.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-700/70 bg-slate-950/50 p-3">
+                <p className="text-xs font-black uppercase tracking-wide text-slate-400">Data</p>
+                <p className="mt-1 text-sm text-slate-300">The city remembers how it worked.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-700/70 bg-slate-950/50 p-3">
+                <p className="text-xs font-black uppercase tracking-wide text-slate-400">Trust</p>
+                <p className="mt-1 text-sm text-slate-300">People still believe cooperation is possible.</p>
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-amber-300/40 bg-amber-950/20 p-4">
+              <p className="text-xs font-black uppercase tracking-wide text-amber-300">Your task</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-amber-50">
+                Stabilize districts, dispatch civic roles, restore enough resources, and open the Route Gate before Day 14 ends.
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs leading-5 text-slate-500">
+                Prototype note: this version tests whether the civic recovery loop is understandable.
+              </p>
+              <button
+                onClick={() => setShowOpeningBrief(false)}
+                className="rounded-2xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-slate-200"
+              >
+                Begin Command
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
+
       <div className="mx-auto max-w-7xl px-4 py-5">
         <header className="mb-3 rounded-3xl border border-slate-800/70 bg-slate-900/70 p-4 shadow-lg">
           <div className="min-w-0">
