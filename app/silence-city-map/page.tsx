@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.3";
+const version = "3.0.4";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -667,18 +667,6 @@ export default function SilenceCityMapPage() {
                         onClick={() => selectDistrict(district)}
                         className="cursor-pointer transition"
                       >
-                        {selected && (
-                          <circle
-                            cx={district.x}
-                            cy={district.y}
-                            r={markerRadius + 3.0}
-                            fill="rgba(14,165,233,0.07)"
-                            stroke="rgba(186,230,253,0.78)"
-                            strokeWidth="0.55"
-                            filter="url(#softGlow)"
-                          />
-                        )}
-
                         {district.status === "Critical" && !selected && (
                           <circle
                             cx={district.x}
@@ -705,10 +693,11 @@ export default function SilenceCityMapPage() {
                         <circle
                           cx={district.x}
                           cy={district.y}
-                          r={markerRadius}
+                          r={selected ? markerRadius + 0.55 : markerRadius}
                           fill={getDistrictFill(district.status, selected)}
-                          stroke={selected ? "rgba(186,230,253,0.88)" : getDistrictRingColor(district.status)}
-                          strokeWidth={selected ? "0.75" : "0.58"}
+                          stroke={getDistrictRingColor(district.status)}
+                          strokeWidth={selected ? "1.05" : "0.58"}
+                          filter={selected ? "url(#softGlow)" : undefined}
                         />
 
                         <text
@@ -727,7 +716,7 @@ export default function SilenceCityMapPage() {
                           textAnchor="middle"
                           fontSize="2.25"
                           fontWeight="900"
-                          fill={selected ? "rgba(224,242,254,1)" : "rgba(226,232,240,0.92)"}
+                          fill="rgba(226,232,240,0.92)"
                           className="select-none"
                         >
                           {getDistrictShortName(district)}
