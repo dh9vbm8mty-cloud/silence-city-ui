@@ -256,6 +256,17 @@ export default function SilenceCityMapPage() {
       ? `${selectedDistrict.name} is still unstable, but the response prevented a worse collapse.`
       : `${selectedDistrict.name} improved after the district response.`;
 
+  const missionPreview = `${getRoleIcon(selectedRole)} ${selectedRole} will perform "${selectedAction}" in ${selectedDistrict.name}.`;
+
+  const missionRisk =
+    selectedDistrict.status === "Critical"
+      ? "High-risk district. A successful mission may reduce collapse pressure."
+      : selectedDistrict.status === "Strained"
+        ? "Moderate-risk district. A successful mission may stabilize local conditions."
+        : selectedDistrict.status === "Locked"
+          ? "Locked objective. Gate-related actions may begin opening preparation."
+          : "Stable district. Mission may improve long-term readiness.";
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-5">
@@ -440,9 +451,9 @@ export default function SilenceCityMapPage() {
               </div>
             </div>
 
-            <aside className="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
+            <aside className="rounded-3xl border border-slate-800 bg-slate-900 p-3.5 shadow-xl">
               <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-300">Mission Dispatch</p>
-              <div className="mt-3 rounded-3xl border border-slate-700 bg-slate-800 p-4">
+              <div className="mt-3 rounded-3xl border border-slate-700 bg-slate-800 p-3.5">
                 <div className="flex items-center gap-3">
                   <span className="text-4xl">{selectedDistrict.icon}</span>
                   <div>
@@ -454,7 +465,7 @@ export default function SilenceCityMapPage() {
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-950 p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-red-300">Current Crisis</p>
+                  <p className="text-xs font-black uppercase tracking-wide text-red-300">Current Crisis</p>
                   <p className="mt-1 text-base font-bold text-white">{selectedDistrict.crisis}</p>
                   <p className="mt-2 text-sm leading-6 text-slate-300">{selectedDistrict.detail}</p>
                 </div>
@@ -499,6 +510,12 @@ export default function SilenceCityMapPage() {
                 </div>
               </div>
 
+              <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-950 p-3">
+                <p className="text-xs font-black uppercase tracking-wide text-sky-300">Mission Preview</p>
+                <p className="mt-1 text-sm font-bold text-white">{missionPreview}</p>
+                <p className="mt-2 text-xs leading-5 text-slate-400">{missionRisk}</p>
+              </div>
+
               <div className="mt-5 grid gap-2">
                 <button
                   onClick={submitDecision}
@@ -508,7 +525,7 @@ export default function SilenceCityMapPage() {
                       : "bg-white text-slate-950 hover:bg-slate-200"
                   }`}
                 >
-                  {submitted ? "Mission Confirmed" : "Confirm Mission"}
+                  {submitted ? "Mission Confirmed ✓" : "Confirm Mission"}
                 </button>
 
                 <button
@@ -522,6 +539,9 @@ export default function SilenceCityMapPage() {
                 >
                   Resolve Day
                 </button>
+                <p className="text-center text-xs text-slate-500">
+                  {submitted ? "Ready to resolve today’s mission." : "Confirm first, then resolve the day."}
+                </p>
               </div>
             </aside>
           </section>
@@ -539,6 +559,16 @@ export default function SilenceCityMapPage() {
                 </p>
                 <p className="mt-2 text-sm text-slate-700">
                   Target district: {selectedDistrict.icon} {selectedDistrict.name}
+                </p>
+              </div>
+
+              <div className="mt-3 rounded-2xl border border-amber-300 bg-white/70 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">District Status Updated</p>
+                <p className="mt-1 text-sm font-bold text-slate-800">
+                  The selected district now reflects the mission result on the city map.
+                </p>
+                <p className="mt-2 text-xs leading-5 text-slate-600">
+                  Continue to the next day and choose the next district pressure to address.
                 </p>
               </div>
 
