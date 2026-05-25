@@ -19,7 +19,7 @@ type District = {
   points: string;
 };
 
-const version = "2.2.3";
+const version = "2.4.3";
 
 const roles = [
   { name: "Engineering", icon: "🛠️" },
@@ -342,82 +342,112 @@ export default function SilenceCityMapPage() {
                 </p>
               </div>
 
-                            <div className="relative min-h-[620px] overflow-hidden rounded-3xl border border-slate-700 bg-[#050b14] shadow-inner">
+                                                        <div className="relative min-h-[620px] overflow-hidden rounded-3xl border border-slate-700 bg-[#040914] shadow-inner">
                 <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                   <defs>
-                    <radialGradient id="cityGlow" cx="50%" cy="44%" r="58%">
-                      <stop offset="0%" stopColor="rgba(251,191,36,0.16)" />
-                      <stop offset="44%" stopColor="rgba(15,23,42,0.18)" />
-                      <stop offset="100%" stopColor="rgba(2,6,23,0.9)" />
+                    <radialGradient id="commandMapGlow" cx="50%" cy="45%" r="65%">
+                      <stop offset="0%" stopColor="rgba(251,191,36,0.075)" />
+                      <stop offset="48%" stopColor="rgba(15,23,42,0.04)" />
+                      <stop offset="100%" stopColor="rgba(2,6,23,0.94)" />
                     </radialGradient>
-                    <pattern id="smallGrid" width="7" height="7" patternUnits="userSpaceOnUse">
-                      <path d="M 7 0 L 0 0 0 7" fill="none" stroke="rgba(148,163,184,0.055)" strokeWidth="0.35" />
-                    </pattern>
+
+                    <radialGradient id="northBlob" cx="50%" cy="50%" r="55%">
+                      <stop offset="0%" stopColor="rgba(100,116,139,0.16)" />
+                      <stop offset="100%" stopColor="rgba(100,116,139,0)" />
+                    </radialGradient>
+
+                    <radialGradient id="eastBlob" cx="50%" cy="50%" r="55%">
+                      <stop offset="0%" stopColor="rgba(56,189,248,0.10)" />
+                      <stop offset="100%" stopColor="rgba(56,189,248,0)" />
+                    </radialGradient>
+
+                    <radialGradient id="gateBlob" cx="50%" cy="50%" r="60%">
+                      <stop offset="0%" stopColor="rgba(251,191,36,0.12)" />
+                      <stop offset="100%" stopColor="rgba(251,191,36,0)" />
+                    </radialGradient>
+
+                    <filter id="softGlow">
+                      <feGaussianBlur stdDeviation="1.4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
                   </defs>
 
-                  <rect x="0" y="0" width="100" height="100" fill="url(#cityGlow)" />
-                  <rect x="0" y="0" width="100" height="100" fill="url(#smallGrid)" opacity="0.22" />
+                  {/* clean command-map base */}
+                  <rect x="0" y="0" width="100" height="100" fill="#040914" />
+                  <rect x="0" y="0" width="100" height="100" fill="url(#commandMapGlow)" />
 
-                  {/* city silhouette boundary */}
-                  <path
-                    d="M9 19 C19 7, 39 5, 58 9 C79 13, 94 30, 94 52 C94 75, 79 94, 54 97 C31 99, 12 86, 7 63 C3 44, 2 29, 9 19Z"
-                    fill="rgba(15,23,42,0.54)"
-                    stroke="rgba(226,232,240,0.22)"
-                    strokeWidth="1"
-                  />
+                  {/* abstract zone atmosphere only, not roads */}
+                  <ellipse cx="48" cy="19" rx="34" ry="17" fill="url(#northBlob)" opacity="0.48" />
+                  <ellipse cx="74" cy="55" rx="23" ry="25" fill="url(#eastBlob)" opacity="0.38" />
+                  <ellipse cx="50" cy="91" rx="28" ry="15" fill="url(#gateBlob)" opacity="0.50" />
 
-                  {/* ruined dead zone */}
-                  <path
-                    d="M4 4 L31 8 L22 26 L8 34 Z"
-                    fill="rgba(127,29,29,0.18)"
-                    stroke="rgba(248,113,113,0.13)"
-                    strokeWidth="0.75"
-                    strokeDasharray="2 2"
-                  />
-                  <text x="9" y="18" fill="rgba(248,113,113,0.24)" fontSize="3" fontWeight="800">DEAD ZONE</text>
-
-                  {/* old city blocks / silhouettes */}
-                  <g fill="rgba(148,163,184,0.08)" stroke="rgba(148,163,184,0.08)" strokeWidth="0.4">
-                    <rect x="16" y="36" width="9" height="5" rx="1" />
-                    <rect x="27" y="20" width="10" height="6" rx="1" />
-                    <rect x="47" y="12" width="12" height="5" rx="1" />
-                    <rect x="68" y="25" width="12" height="6" rx="1" />
-                    <rect x="72" y="54" width="13" height="7" rx="1" />
-                    <rect x="22" y="66" width="12" height="7" rx="1" />
-                    <rect x="47" y="66" width="13" height="7" rx="1" />
+                  {/* irregular ruined city zones, background only */}
+                  <g fill="rgba(30,41,59,0.105)" stroke="rgba(148,163,184,0.085)" strokeWidth="0.38" strokeDasharray="1.4 2.6">
+                    <path d="M15 11 C23 8, 34 9, 43 13 C48 16, 47 24, 41 28 C32 33, 18 31, 11 25 C7 21, 9 14, 15 11Z" />
+                    <path d="M57 11 C67 8, 82 10, 88 17 C93 23, 88 30, 78 32 C67 35, 56 31, 52 24 C49 18, 51 13, 57 11Z" />
+                    <path d="M13 36 C23 32, 38 34, 45 41 C50 47, 45 54, 33 56 C21 58, 10 54, 8 47 C6 42, 8 38, 13 36Z" />
+                    <path d="M55 35 C68 31, 83 34, 91 43 C96 49, 91 57, 79 59 C66 61, 51 56, 48 48 C45 42, 49 37, 55 35Z" />
+                    <path d="M14 63 C25 59, 39 61, 47 69 C52 75, 47 82, 35 84 C23 86, 10 81, 8 73 C7 68, 9 65, 14 63Z" />
+                    <path d="M56 63 C68 60, 84 62, 91 70 C96 76, 90 84, 77 85 C65 87, 51 82, 48 74 C46 69, 50 65, 56 63Z" />
                   </g>
 
-                  {/* canal / broken waterline */}
+                  {/* faint gate corridor terrain */}
                   <path
-                    d="M4 72 C18 66, 31 62, 43 55 C59 45, 72 35, 96 24"
-                    fill="none"
-                    stroke="rgba(56,189,248,0.17)"
-                    strokeWidth="2.7"
-                    strokeLinecap="round"
-                    strokeDasharray="5 4"
+                    d="M39 84 C44 82, 56 82, 61 84 C66 88, 70 94, 72 97 H28 C30 94, 34 88, 39 84Z"
+                    fill="rgba(251,191,36,0.026)"
+                    stroke="rgba(251,191,36,0.07)"
+                    strokeWidth="0.36"
+                    strokeDasharray="1.5 2.7"
                   />
 
-                  {/* route gate corridor */}
+                  {/* outer command boundary */}
                   <path
-                    d="M52 45 C51 58, 53 72, 52 95"
+                    d="M9 15 C18 6, 38 6, 51 8 C70 9, 88 18, 92 35 C96 54, 91 80, 77 91 C63 102, 35 99, 20 91 C8 84, 4 62, 6 42 C7 29, 4 21, 9 15Z"
                     fill="none"
-                    stroke="rgba(251,191,36,0.15)"
-                    strokeWidth="5"
-                    strokeLinecap="round"
+                    stroke="rgba(148,163,184,0.055)"
+                    strokeWidth="0.42"
+                    strokeDasharray="2 4"
                   />
 
-                  {/* civic roads aligned to districts */}
-                  <path d="M22 48 C34 46, 43 45, 52 45 C63 45, 70 52, 78 60" fill="none" stroke="rgba(226,232,240,0.115)" strokeWidth="2.5" strokeLinecap="round" />
-                  <path d="M31 27 C39 22, 45 18, 52 18 C62 19, 68 24, 75 30" fill="none" stroke="rgba(226,232,240,0.095)" strokeWidth="2.2" strokeLinecap="round" />
-                  <path d="M27 72 C38 69, 45 70, 53 72 C64 76, 72 69, 78 60" fill="none" stroke="rgba(226,232,240,0.095)" strokeWidth="2.2" strokeLinecap="round" />
-                  <path d="M52 18 C52 28, 52 36, 52 45" fill="none" stroke="rgba(226,232,240,0.08)" strokeWidth="2" strokeLinecap="round" />
+                  {/* subtle civic core radius */}
+                  <circle
+                    cx="50"
+                    cy="42"
+                    r="16"
+                    fill="none"
+                    stroke="rgba(251,191,36,0.08)"
+                    strokeWidth="0.7"
+                    strokeDasharray="2.5 4"
+                  />
 
-                  {/* civic core ring */}
-                  <circle cx="52" cy="45" r="15" fill="rgba(251,191,36,0.045)" stroke="rgba(251,191,36,0.11)" strokeWidth="0.8" />
-
-                  {/* route gate symbol */}
-                  <path d="M42 97 L42 88 C42 83, 47 80, 52 80 C57 80, 62 83, 62 88 L62 97" fill="none" stroke="rgba(251,191,36,0.24)" strokeWidth="1" />
-                  <text x="52" y="86" textAnchor="middle" fill="rgba(251,191,36,0.32)" fontSize="3" fontWeight="900">GATE</text>
+                  {/* route gate destination glow */}
+                  <circle
+                    cx="50"
+                    cy="90"
+                    r="10"
+                    fill="rgba(251,191,36,0.045)"
+                    stroke="rgba(251,191,36,0.14)"
+                    strokeWidth="0.55"
+                  />
+                  <path
+                    d="M44 98 L44 89 C44 84, 47 82, 50 82 C53 82, 56 84, 56 89 L56 98"
+                    fill="none"
+                    stroke="rgba(251,191,36,0.20)"
+                    strokeWidth="0.6"
+                  />
+                  <text
+                    x="50"
+                    y="83.5"
+                    textAnchor="middle"
+                    fill="rgba(251,191,36,0.30)"
+                    fontSize="2.7"
+                    fontWeight="900"
+                  >
+                    GATE
+                  </text>
 
                   {/* district map markers */}
                   {districts.map((district) => {
@@ -433,10 +463,11 @@ export default function SilenceCityMapPage() {
                             <circle
                               cx={district.x}
                               cy={district.y}
-                              r="7.8"
-                              fill="rgba(251,191,36,0.15)"
-                              stroke="rgba(251,191,36,0.42)"
+                              r="8"
+                              fill="rgba(251,191,36,0.16)"
+                              stroke="rgba(251,191,36,0.44)"
                               strokeWidth="0.55"
+                              filter="url(#softGlow)"
                             />
                             <rect
                               x={district.x - 7.2}
@@ -491,14 +522,14 @@ export default function SilenceCityMapPage() {
                         </text>
 
                         <rect
-                          x={district.x - 10.8}
+                          x={district.x - 11.8}
                           y={district.y + 6}
-                          width="21.6"
+                          width="23.6"
                           height="5.4"
                           rx="2.7"
                           opacity={district.status === "Stable" && !selected ? "0.72" : "1"}
-                          fill={selected ? "rgba(251,191,36,0.84)" : "rgba(15,23,42,0.68)"}
-                          stroke={selected ? "rgba(251,191,36,0.72)" : "rgba(148,163,184,0.16)"}
+                          fill={selected ? "rgba(251,191,36,0.84)" : "rgba(15,23,42,0.76)"}
+                          stroke={selected ? "rgba(251,191,36,0.72)" : "rgba(148,163,184,0.13)"}
                           strokeWidth="0.5"
                         />
 
@@ -506,7 +537,7 @@ export default function SilenceCityMapPage() {
                           x={district.x}
                           y={district.y + 9.7}
                           textAnchor="middle"
-                          fontSize="2.2"
+                          fontSize="2.04"
                           fontWeight="900"
                           fill={selected ? "rgba(15,23,42,1)" : "rgba(226,232,240,0.88)"}
                           className="select-none"
@@ -516,9 +547,6 @@ export default function SilenceCityMapPage() {
                       </g>
                     );
                   })}
-
-                  <text x="39" y="6" fill="rgba(226,232,240,0.16)" fontSize="3" fontWeight="800">NORTHERN RUINS</text>
-                  <text x="34" y="99" fill="rgba(251,191,36,0.28)" fontSize="3" fontWeight="900">ROUTE GATE CORRIDOR</text>
                 </svg>
 
                 <div className="absolute bottom-3 left-3 rounded-2xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs text-slate-300 backdrop-blur">
