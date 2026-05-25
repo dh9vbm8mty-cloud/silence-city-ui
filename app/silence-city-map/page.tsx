@@ -258,10 +258,10 @@ export default function SilenceCityMapPage() {
               Silence City — Map Command Prototype v{version}
             </p>
             <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-4xl">
-              Rebuild the city, one district at a time.
+              Rebuild the city through daily missions.
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-300">
-              Choose a district, send a civic role, resolve the day, and watch the city timeline change.
+              Choose a district, dispatch a role, resolve the day, and watch the city change.
             </p>
           </div>
 
@@ -287,10 +287,10 @@ export default function SilenceCityMapPage() {
               <div className="mb-3 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">City Map</p>
-                  <h2 className="mt-1 text-xl font-black text-white">Choose a District</h2>
+                  <h2 className="mt-1 text-xl font-black text-white">Choose Target District</h2>
                 </div>
                 <p className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">
-                  Fictional recovery map
+                  Recovery map
                 </p>
               </div>
 
@@ -309,7 +309,7 @@ export default function SilenceCityMapPage() {
 
                   {/* deep map background */}
                   <rect x="0" y="0" width="100" height="100" fill="url(#cityGlow)" />
-                  <rect x="0" y="0" width="100" height="100" fill="url(#smallGrid)" opacity="0.45" />
+                  <rect x="0" y="0" width="100" height="100" fill="url(#smallGrid)" opacity="0.28" />
 
                   {/* ruined city boundary */}
                   <path
@@ -327,7 +327,7 @@ export default function SilenceCityMapPage() {
                     strokeWidth="0.8"
                     strokeDasharray="2 2"
                   />
-                  <text x="9" y="18" fill="rgba(248,113,113,0.42)" fontSize="3" fontWeight="800">DEAD ZONE</text>
+                  <text x="9" y="18" fill="rgba(248,113,113,0.28)" fontSize="3" fontWeight="800">DEAD ZONE</text>
 
                   {/* canal / broken waterline */}
                   <path
@@ -425,8 +425,8 @@ export default function SilenceCityMapPage() {
                   })}
 
                   {/* map annotations */}
-                  <text x="42" y="6" fill="rgba(226,232,240,0.28)" fontSize="3" fontWeight="800">NORTH RUINS</text>
-                  <text x="36" y="99" fill="rgba(251,191,36,0.45)" fontSize="3" fontWeight="900">ROUTE GATE CORRIDOR</text>
+                  <text x="42" y="6" fill="rgba(226,232,240,0.18)" fontSize="3" fontWeight="800">NORTH RUINS</text>
+                  <text x="36" y="99" fill="rgba(251,191,36,0.32)" fontSize="3" fontWeight="900">ROUTE GATE CORRIDOR</text>
                 </svg>
 
                 <div className="absolute bottom-3 left-3 rounded-2xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs text-slate-300 backdrop-blur">
@@ -439,7 +439,7 @@ export default function SilenceCityMapPage() {
             </div>
 
             <aside className="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">Selected District</p>
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-300">Mission Dispatch</p>
               <div className="mt-3 rounded-3xl border border-slate-700 bg-slate-800 p-4">
                 <div className="flex items-center gap-3">
                   <span className="text-4xl">{selectedDistrict.icon}</span>
@@ -452,14 +452,14 @@ export default function SilenceCityMapPage() {
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-950 p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-red-300">District Crisis</p>
+                  <p className="text-xs font-bold uppercase tracking-wide text-red-300">Current Crisis</p>
                   <p className="mt-1 text-base font-bold text-white">{selectedDistrict.crisis}</p>
                   <p className="mt-2 text-sm leading-6 text-slate-300">{selectedDistrict.detail}</p>
                 </div>
               </div>
 
               <div className="mt-4">
-                <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Send a Role</p>
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Send Unit</p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {selectedDistrict.recommendedRoles.map((role) => (
                     <button
@@ -479,7 +479,7 @@ export default function SilenceCityMapPage() {
               </div>
 
               <div className="mt-4">
-                <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Choose an Action</p>
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Mission Action</p>
                 <div className="mt-2 space-y-2">
                   {selectedDistrict.actions.map((action) => (
                     <button
@@ -506,7 +506,7 @@ export default function SilenceCityMapPage() {
                       : "bg-white text-slate-950 hover:bg-slate-200"
                   }`}
                 >
-                  {submitted ? "Decision Submitted" : "Submit Decision"}
+                  {submitted ? "Mission Confirmed" : "Confirm Mission"}
                 </button>
 
                 <button
@@ -518,7 +518,7 @@ export default function SilenceCityMapPage() {
                       : "cursor-not-allowed bg-slate-800 text-slate-500"
                   }`}
                 >
-                  End Day
+                  Resolve Day
                 </button>
               </div>
             </aside>
@@ -526,7 +526,7 @@ export default function SilenceCityMapPage() {
         ) : (
           <section className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
             <div className="rounded-3xl border border-amber-300 bg-amber-100 p-5 text-slate-950 shadow-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-700">End-of-Day Report</p>
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-700">Mission Report</p>
               <h2 className="mt-2 text-3xl font-black">Day {day} Result</h2>
               <p className="mt-3 text-lg font-bold">{resultText}</p>
 
@@ -544,13 +544,13 @@ export default function SilenceCityMapPage() {
                 onClick={continueToNextDay}
                 className="mt-5 w-full rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800"
               >
-                Continue to Next Day
+                Next Day
               </button>
             </div>
 
             <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Timeline</p>
-              <h2 className="mt-1 text-xl font-black text-white">City History</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">City Timeline</p>
+              <h2 className="mt-1 text-xl font-black text-white">District Record</h2>
               <div className="mt-4 space-y-2">
                 {timeline.map((item, index) => (
                   <div key={`${item}-${index}`} className="rounded-2xl border border-slate-700 bg-slate-800 p-3 text-sm text-slate-200">
