@@ -5,6 +5,17 @@ import { useMemo, useState } from "react";
 type DistrictStatus = "Stable" | "Strained" | "Critical" | "Locked";
 type ScreenState = "decision" | "result";
 
+type CityResources = {
+  Power: number;
+  Supplies: number;
+  Data: number;
+  Structure: number;
+  Trust: number;
+  Gate: number;
+};
+
+type ResourceDelta = Partial<Record<keyof CityResources, number>>;
+
 type District = {
   id: string;
   name: string;
@@ -19,7 +30,16 @@ type District = {
   points: string;
 };
 
-const version = "2.4.3";
+const version = "2.6.1";
+
+const startingResources: CityResources = {
+  Power: 34,
+  Supplies: 3,
+  Data: 0,
+  Structure: 2,
+  Trust: 1,
+  Gate: 2,
+};
 
 const roles = [
   { name: "Engineering", icon: "🛠️" },
@@ -161,19 +181,84 @@ const statusClass: Record<DistrictStatus, string> = {
   Locked: "border-slate-400 bg-slate-100 text-slate-900",
 };
 
-const statusDot: Record<DistrictStatus, string> = {
-  Stable: "bg-emerald-500",
-  Strained: "bg-amber-500",
-  Critical: "bg-red-500",
-  Locked: "bg-slate-500",
-};
-
 const markerRingClass: Record<DistrictStatus, string> = {
   Stable: "stroke-emerald-400",
   Strained: "stroke-amber-400",
   Critical: "stroke-red-400",
   Locked: "stroke-slate-400",
 };
+
+function getActionDelta(action: string, resources: CityResources): ResourceDelta {
+  const effects: Record<string, ResourceDelta> = {
+    "Stabilize Relay Grid": { Power: 2 },
+    "Inspect Power Lines": { Power: 1, Gate: resources.Power >= 35 ? 1 : 0 },
+    "Route Spare Cells": { Power: 1, Supplies: -1 },
+
+    "Recover Data Fragment": { Data: 1, Gate: 1 },
+    "Index Broken Records": { Data: 1, Trust: 1 },
+    "Restore Civic Memory": { Trust: 1, Gate: resources.Data >= 1 ? 1 : 0 },
+
+    "Catalog Supplies": { Supplies: 2 },
+    "Safe Salvage": { Supplies: 1 },
+    "Move Public Stock": { Trust: 1, Supplies: 1 },
+
+    "Fabricate Structural Part": { Structure: 1, Supplies: -1 },
+    "Repair Tools": { Structure: 1 },
+    "Organize Work Crews": { Trust: 1, Structure: 1 },
+
+    "Open Civic Market": { Trust: 1, Supplies: 1 },
+    "Broker Supply Deal": { Supplies: 2 },
+    "Set Exchange Rules": { Trust: 2 },
+
+    "Run Diagnostic": { Gate: 1 },
+    "Optimize Civic Queue": { Trust: 1, Gate: 1 },
+    "Verify Gate Logic": { Gate: 1, Data: 1 },
+
+    "Prepare Triage": { Trust: 1 },
+    "Move Medical Supplies": { Trust: 1, Supplies: -1 },
+    "Recruit Volunteers": { Trust: 2 },
+
+    "Hold Civic Meeting": { Trust: 2 },
+    "Check Resident Needs": { Trust: 1 },
+    "Stabilize Patrol Routes": { Trust: 1 },
+
+    "Inspect Gate": { Gate: 1 },
+    "Prioritize Gate Readiness": {
+      Gate: resources.Power >= 35 && resources.Data >= 1 && resources.Structure >= 2 ? 2 : 1,
+    },
+    "Draft Opening Plan": { Trust: 1, Gate: 1 },
+  };
+
+  return effects[action] ?? {};
+}
+
+function applyDelta(resources: CityResources, delta: ResourceDelta): CityResources {
+  return {
+    Power: Math.max(0, resources.Power + (delta.Power ?? 0)),
+    Supplies: Math.max(0, resources.Supplies + (delta.Supplies ?? 0)),
+    Data: Math.max(0, resources.Data + (delta.Data ?? 0)),
+    Structure: Math.max(0, resources.Structure + (delta.Structure ?? 0)),
+    Trust: Math.max(0, resources.Trust + (delta.Trust ?? 0)),
+    Gate: Math.min(7, Math.max(0, resources.Gate + (delta.Gate ?? 0))),
+  };
+}
+
+function formatDelta(delta: ResourceDelta) {
+  const entries = Object.entries(delta).filter(([, value]) => value !== 0);
+  if (entries.length === 0) return ["No direct resource change."];
+
+  return entries.map(([key, value]) => `${key} ${value && value > 0 ? "+" : ""}${value}`);
+}
+
+function getResourceIcon(key: keyof CityResources) {
+  if (key === "Power") return "⚡";
+  if (key === "Supplies") return "📦";
+  if (key === "Data") return "💾";
+  if (key === "Structure") return "🧱";
+  if (key === "Trust") return "👥";
+  if (key === "Gate") return "🚪";
+  return "•";
+}
 
 function getRoleIcon(roleName: string) {
   return roles.find((role) => role.name === roleName)?.icon ?? "•";
@@ -200,6 +285,8 @@ export default function SilenceCityMapPage() {
   const [selectedRole, setSelectedRole] = useState("Archivist");
   const [selectedAction, setSelectedAction] = useState("Recover Data Fragment");
   const [submitted, setSubmitted] = useState(false);
+  const [resources, setResources] = useState<CityResources>(startingResources);
+  const [lastDelta, setLastDelta] = useState<ResourceDelta>({});
   const [districts, setDistricts] = useState(startingDistricts);
   const [timeline, setTimeline] = useState<string[]>([
     "Day 3: Housing Block stabilized resident cooperation.",
@@ -212,13 +299,10 @@ export default function SilenceCityMapPage() {
     [districts, selectedDistrictId]
   );
 
-  const gateReadyCount = useMemo(() => {
-    let score = 2;
-    if (districts.find((d) => d.id === "archive")?.status === "Stable") score += 1;
-    if (districts.find((d) => d.id === "power-hub")?.status === "Stable") score += 1;
-    if (districts.find((d) => d.id === "route-gate")?.status !== "Locked") score += 1;
-    return Math.min(score, 7);
-  }, [districts]);
+  const currentDelta = getActionDelta(selectedAction, resources);
+  const currentDeltaText = formatDelta(currentDelta);
+
+  const gateReadyCount = resources.Gate;
 
   function selectDistrict(district: District) {
     if (screen === "result") return;
@@ -235,6 +319,9 @@ export default function SilenceCityMapPage() {
   function endDay() {
     if (!submitted) return;
 
+    const missionDelta = getActionDelta(selectedAction, resources);
+    const nextResources = applyDelta(resources, missionDelta);
+
     const nextDistricts = districts.map((district) => {
       if (district.id !== selectedDistrict.id) return district;
 
@@ -246,9 +333,11 @@ export default function SilenceCityMapPage() {
       return district;
     });
 
+    setResources(nextResources);
+    setLastDelta(missionDelta);
     setDistricts(nextDistricts);
     setTimeline((items) => [
-      `Day ${day}: ${selectedRole} executed "${selectedAction}" in ${selectedDistrict.name}.`,
+      `Day ${day}: ${selectedRole} executed "${selectedAction}" in ${selectedDistrict.name}. ${formatDelta(missionDelta).join(" · ")}`,
       ...items,
     ]);
     setScreen("result");
@@ -258,6 +347,7 @@ export default function SilenceCityMapPage() {
     const nextDay = day + 1;
     setDay(nextDay);
     setSubmitted(false);
+    setLastDelta({});
     setScreen("decision");
 
     const current = districts.find((district) => district.id === selectedDistrictId) ?? districts[0];
@@ -313,19 +403,17 @@ export default function SilenceCityMapPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-3 gap-2 text-center sm:grid-cols-7">
             <div className="rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2">
               <p className="text-xs text-slate-400">Day</p>
               <p className="text-lg font-black">{day}/14</p>
             </div>
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2">
-              <p className="text-xs text-slate-400">Gate</p>
-              <p className="text-lg font-black">{gateReadyCount}/7</p>
-            </div>
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2">
-              <p className="text-xs text-slate-400">Screen</p>
-              <p className="text-sm font-black">{screen === "decision" ? "Decision" : "Result"}</p>
-            </div>
+            {(Object.keys(resources) as Array<keyof CityResources>).map((key) => (
+              <div key={key} className="rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2">
+                <p className="text-xs text-slate-400">{getResourceIcon(key)} {key}</p>
+                <p className="text-lg font-black">{key === "Gate" ? `${resources[key]}/7` : resources[key]}</p>
+              </div>
+            ))}
           </div>
         </header>
 
@@ -624,6 +712,10 @@ export default function SilenceCityMapPage() {
                 <p className="text-xs font-black uppercase tracking-wide text-sky-300">Dispatch Preview</p>
                 <p className="mt-1 text-sm font-bold text-white">{missionPreview}</p>
                 <p className="mt-2 text-xs leading-5 text-slate-400">{missionRisk}</p>
+                <div className="mt-3 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2">
+                  <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">Expected Effects</p>
+                  <p className="mt-1 text-xs font-bold text-slate-200">{currentDeltaText.join(" · ")}</p>
+                </div>
               </div>
 
               <div className="mt-5 grid gap-2">
@@ -692,6 +784,20 @@ export default function SilenceCityMapPage() {
                 <p className="mt-2 text-xs leading-5 text-slate-600">
                   Continue to the next day and choose the next district pressure to address.
                 </p>
+              </div>
+
+              <div className="mt-3 rounded-2xl border border-amber-300 bg-white/70 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Resource Changes</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {formatDelta(lastDelta).map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-black text-slate-800"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
               </div>
 
               <div className="mt-3 rounded-2xl border border-amber-300 bg-white/70 p-4">
