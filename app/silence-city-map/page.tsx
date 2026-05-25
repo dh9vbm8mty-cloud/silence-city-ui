@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.1";
+const version = "3.0.3";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -64,8 +64,8 @@ const startingDistricts: District[] = [
     detail: "The city still has power, but repeated surges are weakening the recovery network.",
     recommendedRoles: ["Engineering", "Logistics", "AI Systems"],
     actions: ["Stabilize Relay Grid", "Inspect Power Lines", "Route Spare Cells"],
-    x: 22,
-    y: 48,
+    x: 18,
+    y: 50,
     points: "10,38 28,34 34,49 25,60 9,56",
   },
   {
@@ -77,8 +77,8 @@ const startingDistricts: District[] = [
     detail: "Materials are moving through the ruins, but citizens do not agree on fair exchange rules.",
     recommendedRoles: ["Merchant", "Negotiation", "Security"],
     actions: ["Open Civic Market", "Broker Supply Deal", "Set Exchange Rules"],
-    x: 34,
-    y: 28,
+    x: 82,
+    y: 22,
     points: "22,17 43,13 48,29 34,38 18,31",
   },
   {
@@ -90,8 +90,8 @@ const startingDistricts: District[] = [
     detail: "Broken records and missing fragments prevent the district from proving what it has rebuilt.",
     recommendedRoles: ["Archivist", "AI Systems", "Exploration"],
     actions: ["Recover Data Fragment", "Index Broken Records", "Restore Civic Memory"],
-    x: 52,
-    y: 18,
+    x: 18,
+    y: 22,
     points: "48,10 69,12 75,28 62,38 47,29",
   },
   {
@@ -103,8 +103,8 @@ const startingDistricts: District[] = [
     detail: "The AI can coordinate recovery, but it will not approve risky operations without clearer civic signals.",
     recommendedRoles: ["AI Systems", "Planner", "Archivist"],
     actions: ["Run Diagnostic", "Optimize Civic Queue", "Verify Gate Logic"],
-    x: 52,
-    y: 47,
+    x: 50,
+    y: 22,
     points: "38,36 55,31 68,43 62,59 45,60 34,48",
   },
   {
@@ -116,8 +116,8 @@ const startingDistricts: District[] = [
     detail: "The medical shelter is functioning, but a serious event could exhaust staff and volunteers.",
     recommendedRoles: ["Medicine", "Logistics", "Negotiation"],
     actions: ["Prepare Triage", "Move Medical Supplies", "Recruit Volunteers"],
-    x: 74,
-    y: 31,
+    x: 82,
+    y: 50,
     points: "72,30 91,34 94,51 80,61 66,50",
   },
   {
@@ -129,8 +129,8 @@ const startingDistricts: District[] = [
     detail: "Tools, scrap, and skilled hands are present, but production still lacks coordination.",
     recommendedRoles: ["Engineering", "Logistics", "Planner"],
     actions: ["Fabricate Structural Part", "Repair Tools", "Organize Work Crews"],
-    x: 30,
-    y: 72,
+    x: 18,
+    y: 78,
     points: "15,62 36,58 43,74 30,88 12,79",
   },
   {
@@ -142,8 +142,8 @@ const startingDistricts: District[] = [
     detail: "Crates, spare cells, and components are scattered through storage without a reliable inventory.",
     recommendedRoles: ["Logistics", "Exploration", "Merchant"],
     actions: ["Catalog Supplies", "Safe Salvage", "Move Public Stock"],
-    x: 56,
-    y: 72,
+    x: 50,
+    y: 78,
     points: "40,62 60,60 70,75 56,89 38,80",
   },
   {
@@ -155,8 +155,8 @@ const startingDistricts: District[] = [
     detail: "Residents will support recovery if missions show visible progress and reduce daily uncertainty.",
     recommendedRoles: ["Negotiation", "Medicine", "Security"],
     actions: ["Hold Civic Meeting", "Check Resident Needs", "Stabilize Patrol Routes"],
-    x: 78,
-    y: 60,
+    x: 82,
+    y: 78,
     points: "68,58 92,55 96,75 81,89 66,75",
   },
   {
@@ -168,8 +168,8 @@ const startingDistricts: District[] = [
     detail: "Opening the gate requires power stability, public supplies, verified records, and coordinated approval.",
     recommendedRoles: ["Planner", "Engineering", "AI Systems"],
     actions: ["Inspect Gate", "Prioritize Gate Readiness", "Draft Opening Plan"],
-    x: 14,
-    y: 14,
+    x: 50,
+    y: 50,
     points: "39,84 61,84 72,97 28,97",
   },
 ];
@@ -273,11 +273,6 @@ function getDistrictFill(status: DistrictStatus, selected: boolean) {
   if (status === "Critical") return "rgba(248,113,113,0.10)";
   if (status === "Strained") return "rgba(251,191,36,0.08)";
   return "rgba(15,23,42,0.54)";
-}
-
-function getDistrictMarkerSize(district: District, selected: boolean) {
-  if (district.id === "route-gate") return selected ? 8.2 : 7.5;
-  return selected ? 7.2 : 6.4;
 }
 
 function getDistrictShortName(district: District) {
@@ -658,14 +653,13 @@ export default function SilenceCityMapPage() {
                     GATE
                   </text>
 
-                  {/* district zone markers */}
+                  {/* district map markers */}
                   {districts.map((district) => {
                     const selected = district.id === selectedDistrictId;
                     const isRouteGate = district.id === "route-gate";
-                    const plateWidth = getZonePlateWidth(district);
-                    const plateHeight = isRouteGate ? 12 : 11;
-                    const plateX = district.x - plateWidth / 2;
-                    const plateY = district.y - plateHeight / 2;
+                    const markerRadius = isRouteGate ? 5.2 : 4.8;
+                    const labelY = district.y + 8.8;
+                    const statusY = district.y + 12.5;
 
                     return (
                       <g
@@ -674,70 +668,63 @@ export default function SilenceCityMapPage() {
                         className="cursor-pointer transition"
                       >
                         {selected && (
-                          <rect
-                            x={plateX - 1.1}
-                            y={plateY - 1.1}
-                            width={plateWidth + 2.2}
-                            height={plateHeight + 2.2}
-                            rx="4.4"
-                            fill="rgba(14,165,233,0.08)"
-                            stroke="rgba(186,230,253,0.72)"
+                          <circle
+                            cx={district.x}
+                            cy={district.y}
+                            r={markerRadius + 3.0}
+                            fill="rgba(14,165,233,0.07)"
+                            stroke="rgba(186,230,253,0.78)"
                             strokeWidth="0.55"
                             filter="url(#softGlow)"
                           />
                         )}
 
-                        <rect
-                          x={plateX}
-                          y={plateY}
-                          width={plateWidth}
-                          height={plateHeight}
-                          rx="4"
-                          fill={
-                            isRouteGate
-                              ? canOpenRouteGate
-                                ? "rgba(120,83,15,0.46)"
-                                : "rgba(15,23,42,0.72)"
-                              : getDistrictFill(district.status, selected)
-                          }
-                          stroke={
-                            selected
-                              ? "rgba(186,230,253,0.85)"
-                              : isRouteGate
-                                ? canOpenRouteGate
-                                  ? "rgba(251,191,36,0.66)"
-                                  : "rgba(148,163,184,0.34)"
-                                : getDistrictRingColor(district.status)
-                          }
-                          strokeWidth={selected ? "0.72" : "0.52"}
-                        />
-
                         {district.status === "Critical" && !selected && (
-                          <rect
-                            x={plateX - 1.4}
-                            y={plateY - 1.4}
-                            width={plateWidth + 2.8}
-                            height={plateHeight + 2.8}
-                            rx="4.8"
-                            fill="rgba(248,113,113,0.06)"
-                            stroke="rgba(248,113,113,0.25)"
+                          <circle
+                            cx={district.x}
+                            cy={district.y}
+                            r={markerRadius + 2.8}
+                            fill="rgba(248,113,113,0.07)"
+                            stroke="rgba(248,113,113,0.24)"
                             strokeWidth="0.45"
                           />
                         )}
 
+                        {isRouteGate && (
+                          <circle
+                            cx={district.x}
+                            cy={district.y}
+                            r={markerRadius + 3.4}
+                            fill={canOpenRouteGate ? "rgba(251,191,36,0.10)" : "rgba(148,163,184,0.07)"}
+                            stroke={canOpenRouteGate ? "rgba(251,191,36,0.55)" : "rgba(148,163,184,0.30)"}
+                            strokeWidth="0.6"
+                            strokeDasharray={canOpenRouteGate ? "0" : "1.2 1.2"}
+                          />
+                        )}
+
+                        <circle
+                          cx={district.x}
+                          cy={district.y}
+                          r={markerRadius}
+                          fill={getDistrictFill(district.status, selected)}
+                          stroke={selected ? "rgba(186,230,253,0.88)" : getDistrictRingColor(district.status)}
+                          strokeWidth={selected ? "0.75" : "0.58"}
+                        />
+
                         <text
-                          x={plateX + 4.3}
-                          y={district.y + 1.2}
+                          x={district.x}
+                          y={district.y + 1.35}
                           textAnchor="middle"
-                          fontSize={isRouteGate ? "3.8" : "3.45"}
+                          fontSize={isRouteGate ? "4.1" : "3.9"}
                           className="select-none"
                         >
                           {district.icon}
                         </text>
 
                         <text
-                          x={plateX + 8}
-                          y={district.y - 1.2}
+                          x={district.x}
+                          y={labelY}
+                          textAnchor="middle"
                           fontSize="2.25"
                           fontWeight="900"
                           fill={selected ? "rgba(224,242,254,1)" : "rgba(226,232,240,0.92)"}
@@ -747,9 +734,10 @@ export default function SilenceCityMapPage() {
                         </text>
 
                         <text
-                          x={plateX + 8}
-                          y={district.y + 2.6}
-                          fontSize="1.85"
+                          x={district.x}
+                          y={statusY}
+                          textAnchor="middle"
+                          fontSize="1.75"
                           fontWeight="800"
                           fill={
                             district.status === "Critical"
