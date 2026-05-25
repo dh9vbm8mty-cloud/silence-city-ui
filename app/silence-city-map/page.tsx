@@ -267,6 +267,13 @@ export default function SilenceCityMapPage() {
           ? "Locked objective. Gate-related actions may begin opening preparation."
           : "Stable district. Mission may improve long-term readiness.";
 
+  const nextRecommendedDistrict =
+    districts.find((district) => district.status === "Critical" && district.id !== selectedDistrict.id) ??
+    districts.find((district) => district.status === "Strained" && district.id !== selectedDistrict.id) ??
+    districts.find((district) => district.status === "Locked" && district.id !== selectedDistrict.id) ??
+    districts.find((district) => district.id !== selectedDistrict.id) ??
+    selectedDistrict;
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-5">
@@ -546,11 +553,23 @@ export default function SilenceCityMapPage() {
             </aside>
           </section>
         ) : (
-          <section className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+          <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="rounded-3xl border border-amber-300 bg-amber-100 p-5 text-slate-950 shadow-xl">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-700">Mission Report</p>
-              <h2 className="mt-2 text-3xl font-black">Day {day} Result</h2>
-              <p className="mt-3 text-lg font-bold">{resultText}</p>
+              <h2 className="mt-2 text-3xl font-black">Day {day} Resolved</h2>
+
+              <div className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-300 bg-white/70 p-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-950 text-3xl">
+                  {selectedDistrict.icon}
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Resolved District</p>
+                  <p className="text-xl font-black">{selectedDistrict.name}</p>
+                  <p className="text-sm font-bold text-slate-700">{selectedDistrict.status}</p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-lg font-bold">{resultText}</p>
 
               <div className="mt-4 rounded-2xl border border-amber-300 bg-white/70 p-4">
                 <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Decision</p>
@@ -572,6 +591,19 @@ export default function SilenceCityMapPage() {
                 </p>
               </div>
 
+              <div className="mt-3 rounded-2xl border border-amber-300 bg-white/70 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Next Recommended District</p>
+                <p className="mt-1 text-base font-black">
+                  {nextRecommendedDistrict.icon} {nextRecommendedDistrict.name}
+                </p>
+                <p className="mt-1 text-sm text-slate-700">
+                  Status: <span className="font-bold">{nextRecommendedDistrict.status}</span>
+                </p>
+                <p className="mt-2 text-xs leading-5 text-slate-600">
+                  The next day can target another unstable district, or continue preparing the Route Gate.
+                </p>
+              </div>
+
               <button
                 onClick={continueToNextDay}
                 className="mt-5 w-full rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800"
@@ -582,7 +614,7 @@ export default function SilenceCityMapPage() {
 
             <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">City Timeline</p>
-              <h2 className="mt-1 text-xl font-black text-white">District Record</h2>
+              <h2 className="mt-1 text-xl font-black text-white">City Timeline</h2>
               <div className="mt-4 space-y-2">
                 {timeline.map((item, index) => (
                   <div key={`${item}-${index}`} className="rounded-2xl border border-slate-700 bg-slate-800 p-3 text-sm text-slate-200">
