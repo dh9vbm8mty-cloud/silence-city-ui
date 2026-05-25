@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.1.3";
+const version = "3.1.4";
 
 const startingResources: CityResources = {
   Power: 34,
