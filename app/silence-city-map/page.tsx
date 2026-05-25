@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.5";
+const version = "3.0.6";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -736,11 +736,11 @@ export default function SilenceCityMapPage() {
                   })}
                 </svg>
 
-                <div className="absolute bottom-3 left-3 rounded-2xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs text-slate-300 backdrop-blur">
-                  <span className="mr-2 inline-block h-3 w-3 rounded-full border border-emerald-400" />Stable
-                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border border-amber-400" />Strained
-                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border border-red-400" />Critical
-                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border border-slate-400" />Locked
+                <div className="absolute bottom-3 left-3 max-w-[92%] rounded-full border border-slate-800/80 bg-slate-950/70 px-3 py-1.5 text-[11px] font-bold text-slate-400 backdrop-blur">
+                  <span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full border border-emerald-400 align-[-1px]" />Stable
+                  <span className="ml-2.5 mr-1.5 inline-block h-2.5 w-2.5 rounded-full border border-amber-400 align-[-1px]" />Strained
+                  <span className="ml-2.5 mr-1.5 inline-block h-2.5 w-2.5 rounded-full border border-red-400 align-[-1px]" />Critical
+                  <span className="ml-2.5 mr-1.5 inline-block h-2.5 w-2.5 rounded-full border border-slate-400 align-[-1px]" />Locked
                 </div>
               </div>
             </div>
@@ -1060,8 +1060,8 @@ export default function SilenceCityMapPage() {
                 Required: Gate 7/7, Power 35+, Data 1+, Structure 2+, Trust 2+ before Day 14 ends.
               </p>
             </div>
-            <div className="mt-3 rounded-2xl border border-slate-800/70 bg-slate-950/40 px-4 py-3" data-note="Map Footer Status">
-              <div className="flex flex-col gap-2 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/35 px-3 py-2" data-note="Map Footer Status">
+              <div className="flex flex-col gap-1.5 text-[11px] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
                 <p>
                   <span className="font-black uppercase tracking-wide text-slate-300">Selected:</span>{" "}
                   {selectedDistrict.icon} {selectedDistrict.name} / {selectedDistrict.status}
