@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.9.3";
+const version = "3.0.0";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -259,6 +259,25 @@ function getResourceIcon(key: keyof CityResources) {
   if (key === "Trust") return "👥";
   if (key === "Gate") return "🚪";
   return "•";
+}
+
+function getDistrictRingColor(status: DistrictStatus) {
+  if (status === "Stable") return "rgba(52,211,153,0.62)";
+  if (status === "Strained") return "rgba(251,191,36,0.62)";
+  if (status === "Critical") return "rgba(248,113,113,0.72)";
+  return "rgba(148,163,184,0.52)";
+}
+
+function getDistrictFill(status: DistrictStatus, selected: boolean) {
+  if (selected) return "rgba(14,165,233,0.12)";
+  if (status === "Critical") return "rgba(248,113,113,0.10)";
+  if (status === "Strained") return "rgba(251,191,36,0.08)";
+  return "rgba(15,23,42,0.54)";
+}
+
+function getDistrictMarkerSize(district: District, selected: boolean) {
+  if (district.id === "route-gate") return selected ? 8.2 : 7.5;
+  return selected ? 7.2 : 6.4;
 }
 
 function describeResourceDelta(key: keyof CityResources, value: number) {
@@ -613,45 +632,68 @@ export default function SilenceCityMapPage() {
                   {/* district map markers */}
                   {districts.map((district) => {
                     const selected = district.id === selectedDistrictId;
+                    const isRouteGate = district.id === "route-gate";
+                    const markerSize = getDistrictMarkerSize(district, selected);
+
                     return (
                       <g
                         key={district.id}
                         onClick={() => selectDistrict(district)}
                         className="cursor-pointer transition"
                       >
+                        {district.status === "Critical" && !selected && (
+                          <circle
+                            cx={district.x}
+                            cy={district.y}
+                            r={markerSize + 2.6}
+                            fill="rgba(248,113,113,0.07)"
+                            stroke="rgba(248,113,113,0.20)"
+                            strokeWidth="0.45"
+                          />
+                        )}
+
                         {selected && (
                           <circle
                             cx={district.x}
                             cy={district.y}
-                            r="7.2"
-                            fill="rgba(14,165,233,0.08)"
-                            stroke="rgba(186,230,253,0.72)"
+                            r={markerSize + 2.7}
+                            fill="rgba(14,165,233,0.07)"
+                            stroke="rgba(186,230,253,0.70)"
                             strokeWidth="0.55"
                             filter="url(#softGlow)"
                           />
                         )}
 
-                        {district.status === "Critical" && !selected && (
+                        {isRouteGate && (
                           <circle
                             cx={district.x}
                             cy={district.y}
-                            r="7.2"
-                            fill="rgba(248,113,113,0.08)"
-                            stroke="rgba(248,113,113,0.24)"
-                            strokeWidth="0.45"
+                            r={markerSize + 3.8}
+                            fill={canOpenRouteGate ? "rgba(251,191,36,0.12)" : "rgba(148,163,184,0.08)"}
+                            stroke={canOpenRouteGate ? "rgba(251,191,36,0.55)" : "rgba(148,163,184,0.30)"}
+                            strokeWidth="0.65"
+                            strokeDasharray={canOpenRouteGate ? "0" : "1.2 1.2"}
                           />
                         )}
 
+                        <circle
+                          cx={district.x}
+                          cy={district.y}
+                          r={markerSize}
+                          fill={getDistrictFill(district.status, selected)}
+                          stroke={selected ? "rgba(186,230,253,0.88)" : getDistrictRingColor(district.status)}
+                          strokeWidth={selected ? "0.75" : "0.58"}
+                        />
+
                         <text
                           x={district.x}
-                          y={district.y + 1.25}
+                          y={district.y + 1.35}
                           textAnchor="middle"
-                          fontSize="4.05"
+                          fontSize={isRouteGate ? "4.25" : "4.05"}
                           className="select-none"
                         >
                           {district.icon}
                         </text>
-
                       </g>
                     );
                   })}
