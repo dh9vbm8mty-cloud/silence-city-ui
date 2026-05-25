@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 const roles = {
   Engineering: {
+    icon: "🛠️",
     identity: "Maintains power, repairs field systems, and keeps the district physically functional.",
     focus: "Best for stabilizing Power and Infrastructure before collapse pressure spreads.",
     risk: "Consumes public materials quickly if used without supply support.",
@@ -12,6 +13,7 @@ const roles = {
     actions: ["Stabilize Power", "Repair Infrastructure", "Support Market Setup"],
   },
   Exploration: {
+    icon: "🧭",
     identity: "Searches unsafe edges of the district for resources, signals, and usable routes.",
     focus: "Best for recovering Scrap, Data, and route knowledge.",
     risk: "Can expose the district to Security pressure when risks are pushed too hard.",
@@ -19,6 +21,7 @@ const roles = {
     actions: ["Safe Salvage", "Risk Salvage", "Route Survey"],
   },
   "AI Systems": {
+    icon: "🧠",
     identity: "Interprets damaged protocols, broken records, and unstable machine guidance.",
     focus: "Best for reducing AI uncertainty and making hidden system pressure readable.",
     risk: "May reveal problems faster than the district can respond to them.",
@@ -26,6 +29,7 @@ const roles = {
     actions: ["AI Diagnostic", "Archive Lead", "System Warning Review"],
   },
   Logistics: {
+    icon: "📦",
     identity: "Coordinates storage, delivery, and public movement across weak infrastructure.",
     focus: "Best for making public resources usable instead of merely collected.",
     risk: "Becomes fragile when Security and Infrastructure are both weak.",
@@ -33,6 +37,7 @@ const roles = {
     actions: ["Storage Audit", "Public Delivery Support", "Security Route Check"],
   },
   Negotiation: {
+    icon: "🤝",
     identity: "Turns private conflict into public agreements, pricing norms, and civic rules.",
     focus: "Best for Treasury, Charter, and legitimacy pressure.",
     risk: "Can create discussion without immediate material improvement.",
@@ -40,6 +45,7 @@ const roles = {
     actions: ["Create Public Treasury", "Charter Hearing", "Public Price Hearing"],
   },
   Security: {
+    icon: "🛡️",
     identity: "Protects routes, deliveries, and public operations from instability and dispute.",
     focus: "Best for keeping public movement possible under risk.",
     risk: "Can stabilize routes without solving supply or governance bottlenecks.",
@@ -47,6 +53,7 @@ const roles = {
     actions: ["Patrol Route", "Escort Public Delivery", "Investigate Dispute"],
   },
   Medicine: {
+    icon: "🩺",
     identity: "Keeps workers, shelters, and recovery teams functional under long-term strain.",
     focus: "Best for protecting civic capacity and reducing hidden fatigue pressure.",
     risk: "Its value may feel indirect until other systems begin failing.",
@@ -54,6 +61,7 @@ const roles = {
     actions: ["Medical Triage", "Fatigue Check", "Shelter Health Review"],
   },
   Archivist: {
+    icon: "📚",
     identity: "Recovers civic memory, old maps, damaged records, and contested truth.",
     focus: "Best for knowledge, Data, and long-term route interpretation.",
     risk: "Recovered records may create political or strategic tension.",
@@ -61,6 +69,7 @@ const roles = {
     actions: ["Recover Civic Record", "Decode Old Map", "Verify Rumor"],
   },
   Merchant: {
+    icon: "⚖️",
     identity: "Connects private exchange with public need through supply, price, and trust.",
     focus: "Best for Treasury, supply movement, and market stabilization.",
     risk: "Can damage public trust if private gain appears stronger than civic contribution.",
@@ -68,6 +77,7 @@ const roles = {
     actions: ["List Item on Market", "Sell at Civic Price", "Broker Supply Deal"],
   },
   Planner: {
+    icon: "🗺️",
     identity: "Turns scattered effort into shared priorities, work crews, and Route Gate preparation.",
     focus: "Best for coordination, multi-system readiness, and strategic recovery.",
     risk: "Planning without resources can become symbolic instead of operational.",
@@ -505,7 +515,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.2.2",
+    version: "1.2.3",
     sessionId,
     playerCode,
     playtestGroup,
@@ -976,7 +986,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.2.2
+            Silence City — District Council Interface v1.2.3
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1140,7 +1150,10 @@ export default function SilenceCityPage() {
                     role === item ? "bg-slate-900 text-white" : "bg-slate-50 hover:bg-white"
                   }`}
                 >
-                  <p className="font-bold">{item}</p>
+                  <p className="flex items-center gap-2 font-bold">
+                    <span className="text-lg leading-none">{roles[item].icon}</span>
+                    <span>{item}</span>
+                  </p>
                   <p className={`mt-2 line-clamp-3 flex-1 text-xs leading-5 ${role === item ? "text-slate-200" : "text-slate-600"}`}>{roles[item].focus}</p>
                 </button>
               ))}
