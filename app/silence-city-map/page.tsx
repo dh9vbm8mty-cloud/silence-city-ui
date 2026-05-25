@@ -302,7 +302,6 @@ export default function SilenceCityMapPage() {
   const currentDelta = getActionDelta(selectedAction, resources);
   const currentDeltaText = formatDelta(currentDelta);
 
-  const gateReadyCount = resources.Gate;
 
   function selectDistrict(district: District) {
     if (screen === "result") return;
@@ -390,28 +389,35 @@ export default function SilenceCityMapPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-5">
-        <header className="mb-4 flex flex-col gap-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl sm:flex-row sm:items-center sm:justify-between">
-          <div>
+        <header className="mb-4 grid gap-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl xl:grid-cols-[1fr_auto] xl:items-center">
+          <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">
               Silence City — Map Command Prototype v{version}
             </p>
             <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-4xl">
               Stabilize the city through daily missions.
             </h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-300">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
               Select a district, dispatch a role, execute the mission, and watch the city change.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-center sm:grid-cols-7">
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2">
-              <p className="text-xs text-slate-400">Day</p>
-              <p className="text-lg font-black">{day}/14</p>
+          <div className="grid w-full grid-cols-3 gap-2 text-center sm:grid-cols-4 xl:min-w-[720px] xl:grid-cols-7">
+            <div className="flex h-[58px] flex-col items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 px-2 py-2">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Day</p>
+              <p className="mt-0.5 text-base font-black leading-none text-white">{day}/14</p>
             </div>
             {(Object.keys(resources) as Array<keyof CityResources>).map((key) => (
-              <div key={key} className="rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2">
-                <p className="text-xs text-slate-400">{getResourceIcon(key)} {key}</p>
-                <p className="text-lg font-black">{key === "Gate" ? `${resources[key]}/7` : resources[key]}</p>
+              <div
+                key={key}
+                className="flex h-[58px] min-w-0 flex-col items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 px-2 py-2"
+              >
+                <p className="w-full truncate text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                  {getResourceIcon(key)} {key}
+                </p>
+                <p className="mt-0.5 text-base font-black leading-none text-white">
+                  {key === "Gate" ? `${resources[key]}/7` : resources[key]}
+                </p>
               </div>
             ))}
           </div>
