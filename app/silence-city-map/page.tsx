@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.0";
+const version = "2.8.1";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -371,6 +371,14 @@ export default function SilenceCityMapPage() {
               };
 
   const recommendedDistrict = districts.find((district) => district.id === recommendedNextMove.districtId);
+
+  const gateRequirementProgress = [
+    { label: "Gate", value: resources.Gate, target: 7, ready: resources.Gate >= 7 },
+    { label: "Power", value: resources.Power, target: 35, ready: resources.Power >= 35 },
+    { label: "Data", value: resources.Data, target: 1, ready: resources.Data >= 1 },
+    { label: "Structure", value: resources.Structure, target: 2, ready: resources.Structure >= 2 },
+    { label: "Trust", value: resources.Trust, target: 2, ready: resources.Trust >= 2 },
+  ];
   const campaignFailed = day > 14 && !routeGateOpened;
   const daysRemaining = Math.max(0, 14 - day);
 
@@ -536,51 +544,44 @@ export default function SilenceCityMapPage() {
           </div>
         </header>
 
-        <section className="mb-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">Campaign Objective</p>
-            <h2 className="mt-2 text-xl font-black text-white">Open the Route Gate before Day 14 ends.</h2>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              <div className={`rounded-2xl border px-3 py-2 ${resources.Gate >= 7 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
-                <p className="text-xs font-bold text-slate-400">Gate Readiness</p>
-                <p className="font-black text-white">{resources.Gate}/7</p>
+        <section className="mb-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">Command Brief</p>
+              <h2 className="mt-2 text-xl font-black text-white">Open the Route Gate before Day 14 ends.</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                Select districts, dispatch missions, and build the required civic resources before the campaign clock expires.
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {gateRequirementProgress.map((item) => (
+                  <span
+                    key={item.label}
+                    className={`rounded-full border px-3 py-1 text-xs font-black ${
+                      item.ready
+                        ? "border-emerald-400 bg-emerald-950/50 text-emerald-200"
+                        : "border-slate-700 bg-slate-800 text-slate-300"
+                    }`}
+                  >
+                    {item.ready ? "✓" : "•"} {item.label} {item.value}/{item.target}
+                  </span>
+                ))}
               </div>
-              <div className={`rounded-2xl border px-3 py-2 ${resources.Power >= 35 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
-                <p className="text-xs font-bold text-slate-400">Power Required</p>
-                <p className="font-black text-white">{resources.Power}/35</p>
-              </div>
-              <div className={`rounded-2xl border px-3 py-2 ${resources.Data >= 1 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
-                <p className="text-xs font-bold text-slate-400">Data Required</p>
-                <p className="font-black text-white">{resources.Data}/1</p>
-              </div>
-              <div className={`rounded-2xl border px-3 py-2 ${resources.Structure >= 2 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
-                <p className="text-xs font-bold text-slate-400">Structure Required</p>
-                <p className="font-black text-white">{resources.Structure}/2</p>
-              </div>
-              <div className={`rounded-2xl border px-3 py-2 ${resources.Trust >= 2 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
-                <p className="text-xs font-bold text-slate-400">Trust Required</p>
-                <p className="font-black text-white">{resources.Trust}/2</p>
-              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4 lg:w-[320px]">
+              <p className="text-xs font-black uppercase tracking-wide text-sky-300">Recommended Move</p>
+              <p className="mt-2 text-sm font-black text-white">
+                {recommendedDistrict ? `${recommendedDistrict.icon} ${recommendedDistrict.name}` : "Route Gate"}
+              </p>
+              <p className="mt-1 text-sm font-bold text-sky-100">{recommendedNextMove.title}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-400">{recommendedNextMove.reason}</p>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-sky-300">Recommended Next Move</p>
-            <h2 className="mt-2 text-xl font-black text-white">
-              {recommendedDistrict ? `${recommendedDistrict.icon} ${recommendedDistrict.name}` : "Route Gate"}
-            </h2>
-            <p className="mt-2 text-sm font-black text-sky-100">{recommendedNextMove.title}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">{recommendedNextMove.reason}</p>
-
-            <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-800 p-3">
-              <p className="text-xs font-black uppercase tracking-wide text-slate-400">How to Play</p>
-              <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm leading-6 text-slate-300">
-                <li>Select a district under pressure.</li>
-                <li>Choose a role and action.</li>
-                <li>Build enough resources to open the Route Gate.</li>
-              </ol>
-            </div>
-          </div>
+          <p className="mt-4 border-t border-slate-800 pt-3 text-xs leading-5 text-slate-500">
+            How to play: select a pressured district → choose a role and action → execute missions to complete the Route Gate requirements.
+          </p>
         </section>
 
         {screen === "decision" ? (
@@ -921,7 +922,8 @@ export default function SilenceCityMapPage() {
                     {getDeltaEntries(currentDelta).length > 0 ? (
                       getDeltaEntries(currentDelta).map(([key, value]) => (
                         <p key={key} className="text-xs font-bold leading-5 text-slate-200">
-                          {getResourceIcon(key)} {value > 0 ? "+" : ""}{value} {key} — {describeResourceDelta(key, value).split(" — ")[1]}
+                          {getResourceIcon(key)} {value > 0 ? "+" : ""}{value} {key}
+                          <span className="font-medium text-slate-400"> — {describeResourceDelta(key, value).split(" — ")[1]}</span>
                         </p>
                       ))
                     ) : (
