@@ -505,7 +505,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.2.1",
+    version: "1.2.2",
     sessionId,
     playerCode,
     playtestGroup,
@@ -976,7 +976,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.2.1
+            Silence City — District Council Interface v1.2.2
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1020,7 +1020,7 @@ export default function SilenceCityPage() {
         
 
         {viewMode === "player" && (
-          <section className="rounded-3xl border bg-white p-4 shadow-sm">
+          <section className="rounded-3xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-slate-50 p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-slate-500">First Time?</p>
@@ -1066,7 +1066,7 @@ export default function SilenceCityPage() {
 
         {viewMode === "player" && (
           <section className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
-            <div className="mb-4 rounded-3xl border bg-white p-4 shadow-sm">
+            <div className="mb-4 rounded-3xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-slate-50 p-4 shadow-sm">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Mission</p>
@@ -1084,7 +1084,7 @@ export default function SilenceCityPage() {
                   </div>
 
                   <div className="rounded-2xl border bg-slate-50 p-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Route Gate Readiness</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-amber-700">Route Gate Readiness</p>
                     <p className="mt-1 text-base font-bold text-slate-900">{visibleRouteGatePassedCount} / {visibleRouteGateChecks.length} ready</p>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
                       <div className={`h-full rounded-full ${visibleRouteGatePassedCount === visibleRouteGateChecks.length ? "bg-emerald-500" : "bg-amber-400"}`} style={{ width: `${visibleRouteGateProgress}%` }} />
@@ -1123,7 +1123,7 @@ export default function SilenceCityPage() {
           <section className="rounded-3xl border bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-sm font-bold uppercase tracking-wide text-slate-700">Step 1 — Choose Who Acts Today</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-indigo-700">Step 1 — Choose Who Acts Today</p>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">Who speaks for the district today?</h2>
                 <p className="mt-2 text-sm text-slate-600">
                   Select one civic role. Each role opens a different set of district actions.
