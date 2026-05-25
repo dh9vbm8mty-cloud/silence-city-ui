@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.0";
+const version = "3.0.1";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -278,6 +278,35 @@ function getDistrictFill(status: DistrictStatus, selected: boolean) {
 function getDistrictMarkerSize(district: District, selected: boolean) {
   if (district.id === "route-gate") return selected ? 8.2 : 7.5;
   return selected ? 7.2 : 6.4;
+}
+
+function getDistrictShortName(district: District) {
+  const names: Record<string, string> = {
+    "power-hub": "Power Relay",
+    "old-market": "Old Market",
+    archive: "Civic Archive",
+    "ai-core": "AI Core",
+    clinic: "Field Clinic",
+    workshop: "Fabrication",
+    depot: "Supply Depot",
+    housing: "Residential",
+    "route-gate": "Route Gate",
+  };
+
+  return names[district.id] ?? district.name;
+}
+
+function getZonePlateWidth(district: District) {
+  if (district.id === "route-gate") return 27;
+  if (district.id === "old-market") return 26;
+  if (district.id === "power-hub") return 29;
+  if (district.id === "archive") return 30;
+  if (district.id === "ai-core") return 22;
+  if (district.id === "clinic") return 27;
+  if (district.id === "workshop") return 27;
+  if (district.id === "depot") return 28;
+  if (district.id === "housing") return 28;
+  return 28;
 }
 
 function describeResourceDelta(key: keyof CityResources, value: number) {
@@ -629,11 +658,14 @@ export default function SilenceCityMapPage() {
                     GATE
                   </text>
 
-                  {/* district map markers */}
+                  {/* district zone markers */}
                   {districts.map((district) => {
                     const selected = district.id === selectedDistrictId;
                     const isRouteGate = district.id === "route-gate";
-                    const markerSize = getDistrictMarkerSize(district, selected);
+                    const plateWidth = getZonePlateWidth(district);
+                    const plateHeight = isRouteGate ? 12 : 11;
+                    const plateX = district.x - plateWidth / 2;
+                    const plateY = district.y - plateHeight / 2;
 
                     return (
                       <g
@@ -641,58 +673,96 @@ export default function SilenceCityMapPage() {
                         onClick={() => selectDistrict(district)}
                         className="cursor-pointer transition"
                       >
-                        {district.status === "Critical" && !selected && (
-                          <circle
-                            cx={district.x}
-                            cy={district.y}
-                            r={markerSize + 2.6}
-                            fill="rgba(248,113,113,0.07)"
-                            stroke="rgba(248,113,113,0.20)"
-                            strokeWidth="0.45"
-                          />
-                        )}
-
                         {selected && (
-                          <circle
-                            cx={district.x}
-                            cy={district.y}
-                            r={markerSize + 2.7}
-                            fill="rgba(14,165,233,0.07)"
-                            stroke="rgba(186,230,253,0.70)"
+                          <rect
+                            x={plateX - 1.1}
+                            y={plateY - 1.1}
+                            width={plateWidth + 2.2}
+                            height={plateHeight + 2.2}
+                            rx="4.4"
+                            fill="rgba(14,165,233,0.08)"
+                            stroke="rgba(186,230,253,0.72)"
                             strokeWidth="0.55"
                             filter="url(#softGlow)"
                           />
                         )}
 
-                        {isRouteGate && (
-                          <circle
-                            cx={district.x}
-                            cy={district.y}
-                            r={markerSize + 3.8}
-                            fill={canOpenRouteGate ? "rgba(251,191,36,0.12)" : "rgba(148,163,184,0.08)"}
-                            stroke={canOpenRouteGate ? "rgba(251,191,36,0.55)" : "rgba(148,163,184,0.30)"}
-                            strokeWidth="0.65"
-                            strokeDasharray={canOpenRouteGate ? "0" : "1.2 1.2"}
+                        <rect
+                          x={plateX}
+                          y={plateY}
+                          width={plateWidth}
+                          height={plateHeight}
+                          rx="4"
+                          fill={
+                            isRouteGate
+                              ? canOpenRouteGate
+                                ? "rgba(120,83,15,0.46)"
+                                : "rgba(15,23,42,0.72)"
+                              : getDistrictFill(district.status, selected)
+                          }
+                          stroke={
+                            selected
+                              ? "rgba(186,230,253,0.85)"
+                              : isRouteGate
+                                ? canOpenRouteGate
+                                  ? "rgba(251,191,36,0.66)"
+                                  : "rgba(148,163,184,0.34)"
+                                : getDistrictRingColor(district.status)
+                          }
+                          strokeWidth={selected ? "0.72" : "0.52"}
+                        />
+
+                        {district.status === "Critical" && !selected && (
+                          <rect
+                            x={plateX - 1.4}
+                            y={plateY - 1.4}
+                            width={plateWidth + 2.8}
+                            height={plateHeight + 2.8}
+                            rx="4.8"
+                            fill="rgba(248,113,113,0.06)"
+                            stroke="rgba(248,113,113,0.25)"
+                            strokeWidth="0.45"
                           />
                         )}
 
-                        <circle
-                          cx={district.x}
-                          cy={district.y}
-                          r={markerSize}
-                          fill={getDistrictFill(district.status, selected)}
-                          stroke={selected ? "rgba(186,230,253,0.88)" : getDistrictRingColor(district.status)}
-                          strokeWidth={selected ? "0.75" : "0.58"}
-                        />
-
                         <text
-                          x={district.x}
-                          y={district.y + 1.35}
+                          x={plateX + 4.3}
+                          y={district.y + 1.2}
                           textAnchor="middle"
-                          fontSize={isRouteGate ? "4.25" : "4.05"}
+                          fontSize={isRouteGate ? "3.8" : "3.45"}
                           className="select-none"
                         >
                           {district.icon}
+                        </text>
+
+                        <text
+                          x={plateX + 8}
+                          y={district.y - 1.2}
+                          fontSize="2.25"
+                          fontWeight="900"
+                          fill={selected ? "rgba(224,242,254,1)" : "rgba(226,232,240,0.92)"}
+                          className="select-none"
+                        >
+                          {getDistrictShortName(district)}
+                        </text>
+
+                        <text
+                          x={plateX + 8}
+                          y={district.y + 2.6}
+                          fontSize="1.85"
+                          fontWeight="800"
+                          fill={
+                            district.status === "Critical"
+                              ? "rgba(252,165,165,0.95)"
+                              : district.status === "Strained"
+                                ? "rgba(252,211,77,0.92)"
+                                : district.status === "Locked"
+                                  ? "rgba(203,213,225,0.70)"
+                                  : "rgba(167,243,208,0.86)"
+                          }
+                          className="select-none"
+                        >
+                          {isRouteGate ? routeGateStatusText : district.status}
                         </text>
                       </g>
                     );
