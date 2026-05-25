@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.7";
+const version = "2.8.8";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -382,8 +382,6 @@ export default function SilenceCityMapPage() {
     { label: "Trust", value: resources.Trust, target: 2, ready: resources.Trust >= 2, display: `${resources.Trust}/2` },
     { label: "Gate Status", value: canOpenRouteGate ? 1 : 0, target: 1, ready: canOpenRouteGate, display: routeGateStatusText },
   ];
-  const campaignFailed = day > 14 && !routeGateOpened;
-  const daysRemaining = Math.max(0, 14 - day);
 
 
   function selectDistrict(district: District) {
