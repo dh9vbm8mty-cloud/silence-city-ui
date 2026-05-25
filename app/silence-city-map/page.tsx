@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.9.1";
+const version = "2.9.3";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -181,13 +181,6 @@ const statusClass: Record<DistrictStatus, string> = {
   Locked: "border-slate-400 bg-slate-100 text-slate-900",
 };
 
-const markerRingClass: Record<DistrictStatus, string> = {
-  Stable: "stroke-emerald-400",
-  Strained: "stroke-amber-400",
-  Critical: "stroke-red-400",
-  Locked: "stroke-slate-400",
-};
-
 function getActionDelta(action: string, resources: CityResources): ResourceDelta {
   const effects: Record<string, ResourceDelta> = {
     "Stabilize Relay Grid": { Power: 2 },
@@ -287,20 +280,6 @@ function getDeltaEntries(delta: ResourceDelta) {
 
 function getRoleIcon(roleName: string) {
   return roles.find((role) => role.name === roleName)?.icon ?? "•";
-}
-
-function getMarkerRadius(status: DistrictStatus, selected: boolean) {
-  if (selected) return 5.35;
-  if (status === "Critical") return 5.05;
-  if (status === "Locked") return 4.9;
-  if (status === "Strained") return 4.7;
-  return 4.45;
-}
-
-function getMarkerOpacity(status: DistrictStatus, selected: boolean) {
-  if (selected) return "1";
-  if (status === "Stable") return "0.72";
-  return "0.94";
 }
 
 export default function SilenceCityMapPage() {
@@ -673,17 +652,6 @@ export default function SilenceCityMapPage() {
                           {district.icon}
                         </text>
 
-                        <rect
-                          x={district.x - 11.8}
-                          y={district.y + 6}
-                          width="23.6"
-                          height="5.4"
-                          rx="2.7"
-                          opacity={district.status === "Stable" && !selected ? "0.72" : "1"}
-                          fill={selected ? "rgba(251,191,36,0.84)" : "rgba(15,23,42,0.76)"}
-                          stroke={selected ? "rgba(251,191,36,0.72)" : "rgba(148,163,184,0.13)"}
-                          strokeWidth="0.5"
-                        />
                       </g>
                     );
                   })}
