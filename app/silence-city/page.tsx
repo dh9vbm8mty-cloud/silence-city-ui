@@ -405,6 +405,10 @@ export default function SilenceCityPage() {
     setSessionId(generatedSessionId);
   }, []);
 
+  const screenLabel = resolved ? "Result Screen" : "Decision Screen";
+  const screenHint = resolved
+    ? "Read what changed, then continue to the next day."
+    : "Choose one role and one action, then end the day.";
   const currentRole = roles[role];
   const dayProgress = Math.round((day / 14) * 100);
   const selectedActionEffectPreview = getActionEffectPreview(action);
@@ -544,7 +548,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.3.0",
+    version: "1.4.0",
     sessionId,
     playerCode,
     playtestGroup,
@@ -674,6 +678,12 @@ export default function SilenceCityPage() {
     setSubmitted(false);
     setResolved(false);
     setLastStateChange("New civic role selected. Choose a proposal and submit.");
+  }
+
+  function continueToNextDay() {
+    setSubmitted(false);
+    setResolved(false);
+    setRouteGateAttemptResult("Route Gate has not been attempted yet.");
   }
 
   function resolveDay() {
@@ -1015,7 +1025,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.3.0
+            Silence City — District Council Interface v1.4.0
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1051,19 +1061,20 @@ export default function SilenceCityPage() {
             </p>
           </div>
 
-          <p className="mt-2 text-sm font-semibold text-slate-500">
-            Current View: {viewMode === "player" ? "Player-facing playtest UI" : "Moderator / backend testing UI"}
-          </p>
+          <div className="mt-3 inline-flex flex-col rounded-2xl border bg-white/80 px-3 py-2 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{screenLabel}</p>
+            <p className="text-sm font-semibold text-slate-800">{screenHint}</p>
+          </div>
         </header>
 
         
 
-        {viewMode === "player" && (
+        {viewMode === "player" && !resolved && (
           <section className="rounded-3xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-slate-50 p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🌅 First Time?</p>
-                <h2 className="mt-1 text-2xl font-bold text-slate-950">Make one district decision per day.</h2>
+                <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🌅 New Player Guide</p>
+                <h2 className="mt-1 text-xl font-bold text-slate-950">One day. One civic decision.</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                   Each day: choose one role, choose one action, then end the day.
                 </p>
@@ -1077,7 +1088,7 @@ export default function SilenceCityPage() {
                 <ol className="mt-2 space-y-1 text-sm text-slate-700">
                   <li><strong>1.</strong> Choose a role.</li>
                   <li><strong>2.</strong> Choose an action.</li>
-                  <li><strong>3.</strong> Submit → End Day and Apply Result.</li>
+                  <li><strong>3.</strong> Submit → End Day.</li>
                   <li><strong>4.</strong> Read the result.</li>
                 </ol>
               </div>
@@ -1090,25 +1101,25 @@ export default function SilenceCityPage() {
 
 
 
-        {viewMode === "player" && (
+        {viewMode === "player" && !resolved && (
           <section className="rounded-3xl border bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-sm font-bold uppercase tracking-wide text-amber-700">⚠️ Today’s Situation</p>
-                <h2 className="mt-1 text-xl font-bold text-slate-900">Main Problem: {civicPriority}</h2>
+                <p className="text-sm font-bold uppercase tracking-wide text-amber-700">⚠️ Today’s Crisis</p>
+                <h2 className="mt-1 text-lg font-bold text-slate-900">Problem: {civicPriority}</h2>
                 <p className="mt-2 text-sm text-slate-600">{civicPriorityReason}</p>
               </div>
             </div>
           </section>
         )}
 
-        {viewMode === "player" && (
+        {viewMode === "player" && !resolved && (
           <section className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
             <div className="mb-4 rounded-3xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-slate-50 p-4 shadow-sm">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🎯 Mission</p>
-                  <h2 className="mt-1 text-2xl font-bold text-slate-950">Open the Route Gate by Day 14</h2>
+                  <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🎯 Main Goal</p>
+                  <h2 className="mt-1 text-xl font-bold text-slate-950">Open the Route Gate by Day 14</h2>
                   <p className="mt-1 text-sm text-slate-600">
                     🧭 Route Gate: {visibleRouteGatePassedCount} of {visibleRouteGateChecks.length} requirements met
                   </p>
@@ -1116,13 +1127,13 @@ export default function SilenceCityPage() {
 
                 <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[360px]">
                   <div className="rounded-2xl border bg-slate-50 p-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-sky-700">👉 Current Step</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-sky-700">👉 Next Move</p>
                     <p className="mt-1 text-base font-bold text-slate-900">{currentStepText}</p>
                     <p className="mt-1 text-xs text-slate-500">{currentStepDetail}</p>
                   </div>
 
                   <div className="rounded-2xl border bg-slate-50 p-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🧭 Route Gate Readiness</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🧭 Gate Readiness</p>
                     <p className="mt-1 text-base font-bold text-slate-900">{visibleRouteGatePassedCount} / {visibleRouteGateChecks.length} ready</p>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
                       <div className={`h-full rounded-full ${visibleRouteGatePassedCount === visibleRouteGateChecks.length ? "bg-emerald-500" : "bg-amber-400"}`} style={{ width: `${visibleRouteGateProgress}%` }} />
@@ -1137,8 +1148,8 @@ export default function SilenceCityPage() {
               {[
                 { step: "1", label: "Choose Role", detail: role },
                 { step: "2", label: "Propose Action", detail: action },
-                { step: "3", label: "End Day and Apply Result", detail: submitted ? proposalStatus : "Submit first" },
-                { step: "4", label: "Read Outcome", detail: resolved ? `Day ${lastResolvedDay}` : "After End Day and Apply Result" },
+                { step: "3", label: "End Day", detail: submitted ? proposalStatus : "Submit first" },
+                { step: "4", label: "Read Outcome", detail: resolved ? `Day ${lastResolvedDay}` : "After End Day" },
               ].map((item) => (
                 <div key={item.step} className="rounded-2xl border bg-slate-50 p-3 text-sm">
                   <div className="flex items-center gap-2">
@@ -1157,14 +1168,14 @@ export default function SilenceCityPage() {
 
 
 
-        {viewMode === "player" && (
+        {viewMode === "player" && !resolved && (
           <section className="rounded-3xl border bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-sm font-bold uppercase tracking-wide text-indigo-700">🧑‍🔧 Today’s Decision — Step 1: Choose Who Acts</p>
-                <h2 className="mt-1 text-xl font-bold text-slate-900">Who speaks for the district today?</h2>
+                <p className="text-sm font-bold uppercase tracking-wide text-indigo-700">🧑‍🔧 Decision 1 — Choose a Role</p>
+                <h2 className="mt-1 text-lg font-bold text-slate-900">Who acts today?</h2>
                 <p className="mt-2 text-sm text-slate-600">
-                  Pick who acts today. Their actions appear below.
+                  Choose one role. Their actions appear below.
                 </p>
               </div>
             </div>
@@ -1189,11 +1200,11 @@ export default function SilenceCityPage() {
           </section>
         )}
 
-        {viewMode === "player" && (
+        {viewMode === "player" && !resolved && (
           <section className="grid gap-4 lg:grid-cols-1">
-            <Panel title={`🗳️ Today’s Decision — Step 2: Choose Action — ${role}`}>
+            <Panel title={`🗳️ Decision 2 — Choose an Action — ${role}`}>
               <div className="rounded-2xl border bg-slate-50 p-3 text-sm text-slate-700">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Selected Role</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Role Focus</p>
                 <p className="mt-1 font-semibold text-slate-900">{currentRole.pressure}</p>
                 <p className="mt-2 text-xs text-slate-500">
                   Best use: {currentRole.focus} · Tradeoff: {currentRole.risk}
@@ -1281,7 +1292,7 @@ export default function SilenceCityPage() {
               </label>
 
               <p className="mt-3 text-xs font-semibold text-slate-500">
-                Next step: {submitted && !resolved ? "End the day to apply the proposal." : resolved ? "Outcome resolved. Start the next proposal for the new day." : "Submit the proposal to unlock End Day and Apply Result."}
+                Next step: {submitted && !resolved ? "End the day to apply the proposal." : resolved ? "Outcome resolved. Start the next proposal for the new day." : "Submit the proposal to unlock End Day."}
               </p>
 
               <div className="mt-4 grid gap-2 md:grid-cols-2">
@@ -1294,14 +1305,14 @@ export default function SilenceCityPage() {
                   disabled={resolved}
                   className={`rounded-2xl px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed ${submitted && !resolved ? "border bg-white text-slate-500" : "bg-slate-900 text-white disabled:bg-slate-300"}`}
                 >
-                  Submit Today’s Decision
+                  Submit Decision
                 </button>
                 <button
                   onClick={resolveDay}
                   disabled={!submitted || resolved}
                   className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 ${submitted && !resolved ? "bg-slate-900 text-white shadow-sm hover:bg-slate-800" : "bg-slate-50 text-slate-700 hover:bg-white"}`}
                 >
-                  {submitted ? "End Day and Apply Result" : "Submit First"}
+                  {submitted ? "End Day" : "Submit First"}
                 </button>
                 <button
                   onClick={() => {
@@ -1317,7 +1328,7 @@ export default function SilenceCityPage() {
                   }}
                   className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${resolved ? "bg-slate-900 text-white shadow-sm hover:bg-slate-800" : "bg-white text-slate-700 hover:bg-slate-50"}`}
                 >
-                  {resolved ? "Start Next Day" : "Return to Draft"}
+                  {resolved ? "Continue to Next Day" : "Return to Draft"}
                 </button>
               </div>
             </Panel>
@@ -1328,7 +1339,7 @@ export default function SilenceCityPage() {
           <section className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
             <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-700">Today’s Result</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-700">Day Result</p>
                 <p className="mt-1 text-sm text-slate-600">{latestCivicEffectText}</p>
               </div>
               <div className="rounded-2xl border bg-slate-50 px-3 py-2 text-xs text-slate-600 md:max-w-md">
@@ -1346,7 +1357,24 @@ export default function SilenceCityPage() {
           </section>
         )}
 
-        {viewMode === "player" && (
+        {viewMode === "player" && resolved && (
+          <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Next</p>
+                <h2 className="mt-1 text-lg font-bold text-slate-900">Continue the district timeline</h2>
+                <p className="mt-1 text-sm text-slate-600">Start the next day and make another civic decision.</p>
+              </div>
+              <button
+                onClick={continueToNextDay}
+                className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-700"
+              >
+                Continue to Next Day
+              </button>
+            </div>
+          </section>
+        )}
+        {viewMode === "player" && resolved && (
           <section className="grid gap-4 lg:grid-cols-1">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
@@ -1377,7 +1405,7 @@ export default function SilenceCityPage() {
                       checked={autoSubmitOnResolve}
                       onChange={(event) => setAutoSubmitOnResolve(event.target.checked)}
                     />
-                    Auto-submit snapshot when End Day and Apply Result completes
+                    Auto-submit snapshot when End Day completes
                   </label>
                 </div>
 
@@ -1401,12 +1429,14 @@ export default function SilenceCityPage() {
               </div>
             )}
           </section>
+
+
         )}
 
         <section className="rounded-3xl border bg-white p-4 shadow-sm">
           <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="text-sm font-bold uppercase tracking-wide text-slate-700">District History</p>
+              <p className="text-sm font-bold uppercase tracking-wide text-slate-700">City History</p>
               <p className="mt-1 text-sm text-slate-600">Review the district outcome, civic memory, and past actions after ending the day.</p>
             </div>
             <div className="rounded-2xl border bg-slate-50 px-3 py-2 text-xs text-slate-600">
@@ -1419,17 +1449,17 @@ export default function SilenceCityPage() {
               <p className="font-bold uppercase tracking-wide text-slate-700">Today’s Outcome</p>
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 <div className="rounded-xl border bg-white p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">What Happened</p>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Outcome</p>
                   <p className="mt-1 text-sm text-slate-700">{latestCivicEffectText}</p>
                 </div>
                 <div className="rounded-xl border bg-white p-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">End of Day</p>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">End-of-Day Effects</p>
                   <p className="mt-1 text-sm text-slate-700">{dailyOutcomeReportText}</p>
                 </div>
               </div>
 
               <div className="mt-3 rounded-xl border bg-white p-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Changes</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Stat Changes</p>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
                   {(lastNetStatChanges.length > 0 ? lastNetStatChanges : ["No numeric change has been resolved yet."]).map((item) => (
                     <span key={item} className={`rounded-full border bg-slate-50 px-3 py-1 ${getOutcomeChangeTextClass(item)}`}>
