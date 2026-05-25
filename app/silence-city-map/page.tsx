@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.3";
+const version = "2.8.4";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -710,7 +710,7 @@ export default function SilenceCityMapPage() {
                               fill="rgba(15,23,42,1)"
                               className="select-none"
                             >
-                              TARGET
+                              SELECTED
                             </text>
                           </>
                         )}
@@ -936,7 +936,7 @@ export default function SilenceCityMapPage() {
                   disabled={!submitted}
                   className={`rounded-2xl px-4 py-3 text-sm font-black transition ${
                     submitted
-                      ? "bg-amber-300 text-slate-950 shadow-lg shadow-amber-400/20 hover:bg-amber-200"
+                      ? "bg-sky-300 text-slate-950 shadow-lg shadow-amber-400/20 hover:bg-amber-200"
                       : "cursor-not-allowed bg-slate-800 text-slate-500"
                   }`}
                 >
