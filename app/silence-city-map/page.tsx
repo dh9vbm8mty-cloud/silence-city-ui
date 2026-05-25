@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 type DistrictStatus = "Stable" | "Strained" | "Critical" | "Locked";
-type ScreenState = "decision" | "result";
+type ScreenState = "decision" | "result" | "victory";
 
 type CityResources = {
   Power: number;
@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.6.2";
+const version = "2.7.0";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -293,6 +293,7 @@ export default function SilenceCityMapPage() {
   const [selectedRole, setSelectedRole] = useState("Archivist");
   const [selectedAction, setSelectedAction] = useState("Recover Data Fragment");
   const [submitted, setSubmitted] = useState(false);
+  const [routeGateOpened, setRouteGateOpened] = useState(false);
   const [resources, setResources] = useState<CityResources>(startingResources);
   const [lastDelta, setLastDelta] = useState<ResourceDelta>({});
   const [districts, setDistricts] = useState(startingDistricts);
@@ -310,6 +311,8 @@ export default function SilenceCityMapPage() {
   const currentDelta = getActionDelta(selectedAction, resources);
   const currentDeltaText = formatDelta(currentDelta);
   const currentCanAfford = canAffordDelta(resources, currentDelta);
+  const canOpenRouteGate = resources.Gate >= 7 && resources.Power >= 35 && resources.Data >= 1 && resources.Structure >= 2 && resources.Trust >= 2;
+  const routeGateStatusText = routeGateOpened ? "Opened" : canOpenRouteGate ? "Ready" : "Sealed";
 
 
   function selectDistrict(district: District) {
@@ -332,6 +335,12 @@ export default function SilenceCityMapPage() {
 
     const missionDelta = getActionDelta(selectedAction, resources);
     const nextResources = applyDelta(resources, missionDelta);
+    const missionCanOpenGate =
+      nextResources.Gate >= 7 &&
+      nextResources.Power >= 35 &&
+      nextResources.Data >= 1 &&
+      nextResources.Structure >= 2 &&
+      nextResources.Trust >= 2;
 
     const nextDistricts = districts.map((district) => {
       if (district.id !== selectedDistrict.id) return district;
@@ -351,6 +360,12 @@ export default function SilenceCityMapPage() {
       `Day ${day}: ${selectedRole} executed "${selectedAction}" in ${selectedDistrict.name}. ${formatDelta(missionDelta).join(" · ")}`,
       ...items,
     ]);
+    if (missionCanOpenGate) {
+      setRouteGateOpened(true);
+      setScreen("victory");
+      return;
+    }
+
     setScreen("result");
   }
 
@@ -414,7 +429,7 @@ export default function SilenceCityMapPage() {
             </p>
           </div>
 
-          <div className="grid w-full grid-cols-3 gap-2 text-center sm:grid-cols-4 xl:min-w-[720px] xl:grid-cols-7">
+          <div className="grid w-full grid-cols-4 gap-2 text-center xl:min-w-[820px] xl:grid-cols-8">
             <div className="flex h-[58px] flex-col items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 px-2 py-2">
               <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Day</p>
               <p className="mt-0.5 text-base font-black leading-none text-white">{day}/14</p>
@@ -432,6 +447,14 @@ export default function SilenceCityMapPage() {
                 </p>
               </div>
             ))}
+            <div className={`flex h-[58px] min-w-0 flex-col items-center justify-center rounded-2xl border px-2 py-2 ${canOpenRouteGate ? "border-amber-300 bg-amber-100 text-slate-950" : "border-slate-700 bg-slate-800"}`}>
+              <p className={`w-full truncate text-[11px] font-bold uppercase tracking-wide ${canOpenRouteGate ? "text-amber-800" : "text-slate-400"}`}>
+                🚪 {routeGateStatusText}
+              </p>
+              <p className={`mt-0.5 text-base font-black leading-none ${canOpenRouteGate ? "text-slate-950" : "text-white"}`}>
+                {canOpenRouteGate ? "YES" : "NO"}
+              </p>
+            </div>
           </div>
         </header>
 
@@ -739,6 +762,15 @@ export default function SilenceCityMapPage() {
                     </p>
                   )}
                 </div>
+
+                <div className={`mt-3 rounded-xl border px-3 py-2 ${canOpenRouteGate ? "border-amber-300 bg-amber-100 text-slate-950" : "border-slate-700 bg-slate-900 text-slate-300"}`}>
+                  <p className={`text-[11px] font-black uppercase tracking-wide ${canOpenRouteGate ? "text-amber-800" : "text-slate-500"}`}>
+                    Route Gate Status
+                  </p>
+                  <p className="mt-1 text-xs font-bold">
+                    {canOpenRouteGate ? "Ready to open after execution." : "Not ready: build Gate 7/7, Power 35+, Data 1+, Structure 2+, Trust 2+."}
+                  </p>
+                </div>
               </div>
 
               <div className="mt-5 grid gap-2">
@@ -777,7 +809,7 @@ export default function SilenceCityMapPage() {
               </div>
             </aside>
           </section>
-        ) : (
+        ) : screen === "result" ? (
           <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="rounded-3xl border border-amber-300 bg-amber-100 p-5 text-slate-950 shadow-xl">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-700">End-of-Day Report</p>
@@ -862,6 +894,39 @@ export default function SilenceCityMapPage() {
                 ))}
               </div>
             </div>
+          </section>
+        ) : (
+          <section className="rounded-3xl border border-amber-300 bg-amber-100 p-6 text-slate-950 shadow-xl">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-700">Route Gate Opened</p>
+            <h2 className="mt-2 text-4xl font-black">The district has opened the Route Gate.</h2>
+            <p className="mt-4 max-w-3xl text-lg font-bold leading-8">
+              After {day} days of civic recovery, the city has enough power, records, structure, trust, and gate readiness to reconnect with the outside route.
+            </p>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {(Object.keys(resources) as Array<keyof CityResources>).map((key) => (
+                <div key={key} className="rounded-2xl border border-amber-300 bg-white/70 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{getResourceIcon(key)} {key}</p>
+                  <p className="mt-1 text-2xl font-black">{key === "Gate" ? `${resources[key]}/7` : resources[key]}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-amber-300 bg-white/70 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Final Mission</p>
+              <p className="mt-1 font-black">{getRoleIcon(selectedRole)} {selectedRole} → {selectedAction}</p>
+              <p className="mt-2 text-sm font-bold text-slate-700">Target district: {selectedDistrict.icon} {selectedDistrict.name}</p>
+            </div>
+
+            <button
+              onClick={() => {
+                setRouteGateOpened(false);
+                setScreen("decision");
+              }}
+              className="mt-5 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800"
+            >
+              Continue Sandbox
+            </button>
           </section>
         )}
       </div>
