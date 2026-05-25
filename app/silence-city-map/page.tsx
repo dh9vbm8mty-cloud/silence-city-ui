@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.1.4";
+const version = "3.2.2";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -641,6 +641,13 @@ export default function SilenceCityMapPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
+      <div data-note="Visible First Order Guide" className="fixed right-4 top-4 z-[9999] max-w-sm rounded-2xl border border-sky-300/50 bg-slate-900/95 p-4 text-white shadow-2xl backdrop-blur">
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Recommended First Order</p>
+        <p className="mt-2 text-sm font-black text-white">Start with ⚡ Power Relay Yard or 🧠 Civic AI Core.</p>
+        <p className="mt-1 text-xs leading-5 text-slate-300">
+          Power instability threatens every district. Stabilizing shared systems makes the rest of the city easier to recover.
+        </p>
+      </div>
 
       <div className="mx-auto max-w-7xl px-4 py-5">
         <header className="mb-3 rounded-3xl border border-slate-800/70 bg-slate-900/70 p-4 shadow-lg">
