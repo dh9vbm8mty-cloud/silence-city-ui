@@ -505,7 +505,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.1.1",
+    version: "1.2.0",
     sessionId,
     playerCode,
     playtestGroup,
@@ -976,7 +976,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.1.1
+            Silence City — District Council Interface v1.2.0
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1028,6 +1028,34 @@ export default function SilenceCityPage() {
             <span className="text-slate-600">Fit: <strong className="text-slate-900">{proposalFit}</strong></span>
           </div>
         </section>
+
+        {viewMode === "player" && (
+          <section className="rounded-3xl border bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">First Time?</p>
+                <h2 className="mt-1 text-2xl font-bold text-slate-950">Guide a damaged district through 14 days.</h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                  Each day, choose one civic role and one action. Your goal is to prepare the district to open the Route Gate before Day 14 ends.
+                </p>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                  You do not need to maximize every stat. You need enough Power, resources, Treasury, and civic readiness to open the gate.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border bg-slate-50 p-3 lg:min-w-[280px]">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Start Here</p>
+                <ol className="mt-2 space-y-1 text-sm text-slate-700">
+                  <li><strong>1.</strong> Read today&apos;s problem.</li>
+                  <li><strong>2.</strong> Choose who acts today.</li>
+                  <li><strong>3.</strong> Choose one action.</li>
+                  <li><strong>4.</strong> Submit, then End Day.</li>
+                  <li><strong>5.</strong> Read what changed.</li>
+                </ol>
+              </div>
+            </div>
+          </section>
+        )}
 
         {viewMode === "player" && (
           <section className="rounded-2xl border bg-white px-4 py-3 shadow-sm">
@@ -1134,7 +1162,7 @@ export default function SilenceCityPage() {
           <section className="rounded-3xl border bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-sm font-bold uppercase tracking-wide text-slate-700">Choose Acting Role</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-slate-700">Step 1 — Choose Who Acts Today</p>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">Who speaks for the district today?</h2>
                 <p className="mt-2 text-sm text-slate-600">
                   Select one civic role. Each role opens a different set of district actions.
@@ -1161,7 +1189,7 @@ export default function SilenceCityPage() {
 
         {viewMode === "player" && (
           <section className="grid gap-4 lg:grid-cols-1">
-            <Panel title={`Propose District Action — ${role}`}>
+            <Panel title={`Step 2 — Choose Today’s Action — ${role}`}>
               <div className="rounded-2xl border bg-slate-50 p-3 text-sm text-slate-700">
                 <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Role Concern</p>
                 <p className="mt-1 font-semibold text-slate-900">{currentRole.pressure}</p>
