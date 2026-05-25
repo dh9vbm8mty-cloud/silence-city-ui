@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.2";
+const version = "2.8.3";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -372,12 +372,15 @@ export default function SilenceCityMapPage() {
 
   const recommendedDistrict = districts.find((district) => district.id === recommendedNextMove.districtId);
 
-  const gateRequirementProgress = [
-    { label: "Gate", value: resources.Gate, target: 7, ready: resources.Gate >= 7 },
-    { label: "Power", value: resources.Power, target: 35, ready: resources.Power >= 35 },
-    { label: "Data", value: resources.Data, target: 1, ready: resources.Data >= 1 },
-    { label: "Structure", value: resources.Structure, target: 2, ready: resources.Structure >= 2 },
-    { label: "Trust", value: resources.Trust, target: 2, ready: resources.Trust >= 2 },
+  const commandResourceStatus = [
+    { label: "Day", value: day, target: 14, ready: day <= 14, display: `${day}/14` },
+    { label: "Gate", value: resources.Gate, target: 7, ready: resources.Gate >= 7, display: `${resources.Gate}/7` },
+    { label: "Power", value: resources.Power, target: 35, ready: resources.Power >= 35, display: `${resources.Power}/35` },
+    { label: "Supplies", value: resources.Supplies, target: null, ready: resources.Supplies > 0, display: `${resources.Supplies}` },
+    { label: "Data", value: resources.Data, target: 1, ready: resources.Data >= 1, display: `${resources.Data}/1` },
+    { label: "Structure", value: resources.Structure, target: 2, ready: resources.Structure >= 2, display: `${resources.Structure}/2` },
+    { label: "Trust", value: resources.Trust, target: 2, ready: resources.Trust >= 2, display: `${resources.Trust}/2` },
+    { label: "Gate Status", value: canOpenRouteGate ? 1 : 0, target: 1, ready: canOpenRouteGate, display: routeGateStatusText },
   ];
   const campaignFailed = day > 14 && !routeGateOpened;
   const daysRemaining = Math.max(0, 14 - day);
@@ -498,7 +501,7 @@ export default function SilenceCityMapPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-5">
-        <header className="mb-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
+        <header className="mb-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">
               Silence City — Map Command Prototype v{version}
@@ -511,41 +514,10 @@ export default function SilenceCityMapPage() {
             </p>
           </div>
 
-          <div className="mt-4 grid w-full grid-cols-3 gap-2 text-center sm:grid-cols-5 xl:grid-cols-9">
-            <div className="flex h-[58px] flex-col items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 px-2 py-2">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Day</p>
-              <p className="mt-0.5 text-base font-black leading-none text-white">{day}/14</p>
-            </div>
-            <div className={`flex h-[58px] flex-col items-center justify-center rounded-2xl border px-2 py-2 ${campaignFailed ? "border-red-300 bg-red-100 text-slate-950" : "border-slate-700 bg-slate-800"}`}>
-              <p className={`text-[11px] font-bold uppercase tracking-wide ${campaignFailed ? "text-red-800" : "text-slate-400"}`}>Days Left</p>
-              <p className={`mt-0.5 text-base font-black leading-none ${campaignFailed ? "text-slate-950" : "text-white"}`}>{daysRemaining}</p>
-            </div>
-            {(Object.keys(resources) as Array<keyof CityResources>).map((key) => (
-              <div
-                key={key}
-                className="flex h-[58px] min-w-0 flex-col items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 px-2 py-2"
-              >
-                <p className="w-full truncate text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                  {getResourceIcon(key)} {key}
-                </p>
-                <p className="mt-0.5 text-base font-black leading-none text-white">
-                  {key === "Gate" ? `${resources[key]}/7` : resources[key]}
-                </p>
-              </div>
-            ))}
-            <div className={`flex h-[58px] min-w-0 flex-col items-center justify-center rounded-2xl border px-2 py-2 ${canOpenRouteGate ? "border-amber-300 bg-amber-100 text-slate-950" : "border-slate-700 bg-slate-800"}`}>
-              <p className={`w-full truncate text-[11px] font-bold uppercase tracking-wide ${canOpenRouteGate ? "text-amber-800" : "text-slate-400"}`}>
-                🚪 {routeGateStatusText}
-              </p>
-              <p className={`mt-0.5 text-base font-black leading-none ${canOpenRouteGate ? "text-slate-950" : "text-white"}`}>
-                {canOpenRouteGate ? "YES" : "NO"}
-              </p>
-            </div>
-          </div>
         </header>
 
-        <section className="mb-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <section className="mb-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-3 shadow-xl">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">Command Brief</p>
               <h2 className="mt-1 text-lg font-black text-white">Open the Route Gate before Day 14 ends.</h2>
@@ -555,7 +527,7 @@ export default function SilenceCityMapPage() {
             </div>
 
             <div className="flex flex-wrap gap-2 xl:justify-end">
-              {gateRequirementProgress.map((item) => (
+              {commandResourceStatus.map((item) => (
                 <span
                   key={item.label}
                   className={`rounded-full border px-3 py-1 text-xs font-black ${
@@ -564,13 +536,13 @@ export default function SilenceCityMapPage() {
                       : "border-slate-700 bg-slate-800 text-slate-300"
                   }`}
                 >
-                  {item.ready ? "✓" : "•"} {item.label} {item.value}/{item.target}
+                  {item.ready ? "✓" : "•"} {item.label} {item.display}
                 </span>
               ))}
             </div>
           </div>
 
-          <div className="mt-3 rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2">
+          <div className="mt-3 rounded-2xl border border-slate-800 bg-slate-950/50 px-3 py-2">
             <p className="text-xs leading-5 text-slate-400">
               <span className="font-black uppercase tracking-wide text-sky-300">Recommended:</span>{" "}
               <span className="font-bold text-white">
