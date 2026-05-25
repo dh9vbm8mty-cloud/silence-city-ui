@@ -37,13 +37,13 @@ const roles = [
 const startingDistricts: District[] = [
   {
     id: "power-hub",
-    name: "Power Hub",
+    name: "Power Relay Yard",
     icon: "⚡",
     status: "Strained",
-    crisis: "Power output is unstable.",
-    detail: "The district can survive one more day, but the grid is close to failing.",
+    crisis: "The relay grid is losing rhythm.",
+    detail: "The city still has power, but repeated surges are weakening the recovery network.",
     recommendedRoles: ["Engineering", "Logistics", "AI Systems"],
-    actions: ["Stabilize Power", "Inspect Relay Yard", "Route Spare Cells"],
+    actions: ["Stabilize Relay Grid", "Inspect Power Lines", "Route Spare Cells"],
     x: 22,
     y: 48,
     points: "10,38 28,34 34,49 25,60 9,56",
@@ -53,34 +53,34 @@ const startingDistricts: District[] = [
     name: "Old Market",
     icon: "🏚️",
     status: "Strained",
-    crisis: "Trade routes are disorganized.",
-    detail: "Useful materials exist here, but the market has no trusted exchange rules.",
+    crisis: "Trade has returned, but trust has not.",
+    detail: "Materials are moving through the ruins, but citizens do not agree on fair exchange rules.",
     recommendedRoles: ["Merchant", "Negotiation", "Security"],
-    actions: ["Open Civic Market", "Broker Supply Deal", "Secure Exchange Zone"],
+    actions: ["Open Civic Market", "Broker Supply Deal", "Set Exchange Rules"],
     x: 34,
     y: 28,
     points: "22,17 43,13 48,29 34,38 18,31",
   },
   {
     id: "archive",
-    name: "Archive",
+    name: "Civic Archive",
     icon: "📚",
     status: "Critical",
-    crisis: "Public records are fragmented.",
-    detail: "A missing Data Fragment blocks the Route Gate readiness checklist.",
+    crisis: "The city memory is incomplete.",
+    detail: "Broken records and missing fragments prevent the district from proving what it has rebuilt.",
     recommendedRoles: ["Archivist", "AI Systems", "Exploration"],
-    actions: ["Recover Data Fragment", "Index Broken Records", "Survey Old Files"],
+    actions: ["Recover Data Fragment", "Index Broken Records", "Restore Civic Memory"],
     x: 52,
     y: 18,
     points: "48,10 69,12 75,28 62,38 47,29",
   },
   {
     id: "ai-core",
-    name: "AI Core",
+    name: "Civic AI Core",
     icon: "🧠",
     status: "Stable",
-    crisis: "The city AI is stable, but cautious.",
-    detail: "The AI can help coordinate repairs if the district avoids overloading it.",
+    crisis: "The city AI is stable, but withholding trust.",
+    detail: "The AI can coordinate recovery, but it will not approve risky operations without clearer civic signals.",
     recommendedRoles: ["AI Systems", "Planner", "Archivist"],
     actions: ["Run Diagnostic", "Optimize Civic Queue", "Verify Gate Logic"],
     x: 52,
@@ -89,11 +89,11 @@ const startingDistricts: District[] = [
   },
   {
     id: "clinic",
-    name: "Clinic",
+    name: "Field Clinic",
     icon: "🏥",
     status: "Strained",
-    crisis: "Medical supply rotation is weak.",
-    detail: "The clinic can treat minor incidents, but cannot handle a citywide shock.",
+    crisis: "The clinic can treat wounds, not panic.",
+    detail: "The medical shelter is functioning, but a serious event could exhaust staff and volunteers.",
     recommendedRoles: ["Medicine", "Logistics", "Negotiation"],
     actions: ["Prepare Triage", "Move Medical Supplies", "Recruit Volunteers"],
     x: 74,
@@ -102,11 +102,11 @@ const startingDistricts: District[] = [
   },
   {
     id: "workshop",
-    name: "Workshop",
+    name: "Fabrication Yard",
     icon: "🛠️",
     status: "Stable",
-    crisis: "Repair capacity is limited.",
-    detail: "The workshop can produce Structural Parts if supplied with Scrap.",
+    crisis: "The city can repair parts, but not fast enough.",
+    detail: "Tools, scrap, and skilled hands are present, but production still lacks coordination.",
     recommendedRoles: ["Engineering", "Logistics", "Planner"],
     actions: ["Fabricate Structural Part", "Repair Tools", "Organize Work Crews"],
     x: 30,
@@ -115,11 +115,11 @@ const startingDistricts: District[] = [
   },
   {
     id: "depot",
-    name: "Depot",
+    name: "Supply Depot",
     icon: "📦",
     status: "Strained",
-    crisis: "Storage is poorly catalogued.",
-    detail: "Resources exist, but the district does not know what is usable.",
+    crisis: "The district owns supplies it cannot find.",
+    detail: "Crates, spare cells, and components are scattered through storage without a reliable inventory.",
     recommendedRoles: ["Logistics", "Exploration", "Merchant"],
     actions: ["Catalog Supplies", "Safe Salvage", "Move Public Stock"],
     x: 56,
@@ -128,11 +128,11 @@ const startingDistricts: District[] = [
   },
   {
     id: "housing",
-    name: "Housing Block",
+    name: "Residential Ring",
     icon: "🏘️",
     status: "Stable",
-    crisis: "Resident trust is fragile.",
-    detail: "People will cooperate if they see practical recovery progress.",
+    crisis: "People are cooperating, but only barely.",
+    detail: "Residents will support recovery if missions show visible progress and reduce daily uncertainty.",
     recommendedRoles: ["Negotiation", "Medicine", "Security"],
     actions: ["Hold Civic Meeting", "Check Resident Needs", "Stabilize Patrol Routes"],
     x: 78,
@@ -144,8 +144,8 @@ const startingDistricts: District[] = [
     name: "Route Gate",
     icon: "🚪",
     status: "Locked",
-    crisis: "The gate is not ready to open.",
-    detail: "The city needs Power, resources, civic readiness, and verified gate logic.",
+    crisis: "The city exit remains sealed.",
+    detail: "Opening the gate requires power stability, public supplies, verified records, and coordinated approval.",
     recommendedRoles: ["Planner", "Engineering", "AI Systems"],
     actions: ["Inspect Gate", "Prioritize Gate Readiness", "Draft Opening Plan"],
     x: 52,
@@ -342,64 +342,82 @@ export default function SilenceCityMapPage() {
                 </p>
               </div>
 
-              <div className="relative min-h-[600px] overflow-hidden rounded-3xl border border-slate-700 bg-[#050b14] shadow-inner">
+                            <div className="relative min-h-[620px] overflow-hidden rounded-3xl border border-slate-700 bg-[#050b14] shadow-inner">
                 <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                   <defs>
-                    <radialGradient id="cityGlow" cx="50%" cy="45%" r="55%">
-                      <stop offset="0%" stopColor="rgba(251,191,36,0.18)" />
-                      <stop offset="45%" stopColor="rgba(15,23,42,0.15)" />
-                      <stop offset="100%" stopColor="rgba(2,6,23,0.85)" />
+                    <radialGradient id="cityGlow" cx="50%" cy="44%" r="58%">
+                      <stop offset="0%" stopColor="rgba(251,191,36,0.16)" />
+                      <stop offset="44%" stopColor="rgba(15,23,42,0.18)" />
+                      <stop offset="100%" stopColor="rgba(2,6,23,0.9)" />
                     </radialGradient>
-                    <pattern id="smallGrid" width="6" height="6" patternUnits="userSpaceOnUse">
-                      <path d="M 6 0 L 0 0 0 6" fill="none" stroke="rgba(148,163,184,0.08)" strokeWidth="0.4" />
+                    <pattern id="smallGrid" width="7" height="7" patternUnits="userSpaceOnUse">
+                      <path d="M 7 0 L 0 0 0 7" fill="none" stroke="rgba(148,163,184,0.055)" strokeWidth="0.35" />
                     </pattern>
                   </defs>
 
-                  {/* deep map background */}
                   <rect x="0" y="0" width="100" height="100" fill="url(#cityGlow)" />
-                  <rect x="0" y="0" width="100" height="100" fill="url(#smallGrid)" opacity="0.18" />
+                  <rect x="0" y="0" width="100" height="100" fill="url(#smallGrid)" opacity="0.22" />
 
-                  {/* ruined city boundary */}
+                  {/* city silhouette boundary */}
                   <path
                     d="M9 19 C19 7, 39 5, 58 9 C79 13, 94 30, 94 52 C94 75, 79 94, 54 97 C31 99, 12 86, 7 63 C3 44, 2 29, 9 19Z"
-                    fill="rgba(15,23,42,0.55)"
-                    stroke="rgba(226,232,240,0.25)"
-                    strokeWidth="1.2"
+                    fill="rgba(15,23,42,0.54)"
+                    stroke="rgba(226,232,240,0.22)"
+                    strokeWidth="1"
                   />
 
-                  {/* dead zone / collapsed district texture */}
+                  {/* ruined dead zone */}
                   <path
                     d="M4 4 L31 8 L22 26 L8 34 Z"
-                    fill="rgba(127,29,29,0.22)"
-                    stroke="rgba(248,113,113,0.18)"
-                    strokeWidth="0.8"
+                    fill="rgba(127,29,29,0.18)"
+                    stroke="rgba(248,113,113,0.13)"
+                    strokeWidth="0.75"
                     strokeDasharray="2 2"
                   />
-                  <text x="9" y="18" fill="rgba(248,113,113,0.28)" fontSize="3" fontWeight="800">DEAD ZONE</text>
+                  <text x="9" y="18" fill="rgba(248,113,113,0.24)" fontSize="3" fontWeight="800">DEAD ZONE</text>
+
+                  {/* old city blocks / silhouettes */}
+                  <g fill="rgba(148,163,184,0.08)" stroke="rgba(148,163,184,0.08)" strokeWidth="0.4">
+                    <rect x="16" y="36" width="9" height="5" rx="1" />
+                    <rect x="27" y="20" width="10" height="6" rx="1" />
+                    <rect x="47" y="12" width="12" height="5" rx="1" />
+                    <rect x="68" y="25" width="12" height="6" rx="1" />
+                    <rect x="72" y="54" width="13" height="7" rx="1" />
+                    <rect x="22" y="66" width="12" height="7" rx="1" />
+                    <rect x="47" y="66" width="13" height="7" rx="1" />
+                  </g>
 
                   {/* canal / broken waterline */}
                   <path
                     d="M4 72 C18 66, 31 62, 43 55 C59 45, 72 35, 96 24"
                     fill="none"
-                    stroke="rgba(56,189,248,0.2)"
-                    strokeWidth="3"
+                    stroke="rgba(56,189,248,0.17)"
+                    strokeWidth="2.7"
                     strokeLinecap="round"
                     strokeDasharray="5 4"
                   />
 
                   {/* route gate corridor */}
                   <path
-                    d="M50 44 C50 58, 51 72, 50 95"
+                    d="M52 45 C51 58, 53 72, 52 95"
                     fill="none"
-                    stroke="rgba(251,191,36,0.16)"
+                    stroke="rgba(251,191,36,0.15)"
                     strokeWidth="5"
                     strokeLinecap="round"
                   />
 
-                  {/* civic roads */}
-                  <path d="M18 48 C31 45, 39 45, 50 44 C63 44, 73 50, 82 60" fill="none" stroke="rgba(226,232,240,0.11)" strokeWidth="2.6" strokeLinecap="round" />
-                  <path d="M34 27 C42 22, 47 18, 58 20 C66 22, 73 28, 82 42" fill="none" stroke="rgba(226,232,240,0.09)" strokeWidth="2.1" strokeLinecap="round" />
-                  <path d="M26 73 C39 69, 48 69, 56 73 C66 78, 75 72, 82 60" fill="none" stroke="rgba(226,232,240,0.09)" strokeWidth="2.1" strokeLinecap="round" />
+                  {/* civic roads aligned to districts */}
+                  <path d="M22 48 C34 46, 43 45, 52 45 C63 45, 70 52, 78 60" fill="none" stroke="rgba(226,232,240,0.115)" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M31 27 C39 22, 45 18, 52 18 C62 19, 68 24, 75 30" fill="none" stroke="rgba(226,232,240,0.095)" strokeWidth="2.2" strokeLinecap="round" />
+                  <path d="M27 72 C38 69, 45 70, 53 72 C64 76, 72 69, 78 60" fill="none" stroke="rgba(226,232,240,0.095)" strokeWidth="2.2" strokeLinecap="round" />
+                  <path d="M52 18 C52 28, 52 36, 52 45" fill="none" stroke="rgba(226,232,240,0.08)" strokeWidth="2" strokeLinecap="round" />
+
+                  {/* civic core ring */}
+                  <circle cx="52" cy="45" r="15" fill="rgba(251,191,36,0.045)" stroke="rgba(251,191,36,0.11)" strokeWidth="0.8" />
+
+                  {/* route gate symbol */}
+                  <path d="M42 97 L42 88 C42 83, 47 80, 52 80 C57 80, 62 83, 62 88 L62 97" fill="none" stroke="rgba(251,191,36,0.24)" strokeWidth="1" />
+                  <text x="52" y="86" textAnchor="middle" fill="rgba(251,191,36,0.32)" fontSize="3" fontWeight="900">GATE</text>
 
                   {/* district map markers */}
                   {districts.map((district) => {
@@ -442,7 +460,6 @@ export default function SilenceCityMapPage() {
                           </>
                         )}
 
-                        {/* Critical district pulse */}
                         {district.status === "Critical" && !selected && (
                           <circle
                             cx={district.x}
@@ -474,9 +491,9 @@ export default function SilenceCityMapPage() {
                         </text>
 
                         <rect
-                          x={district.x - 9}
+                          x={district.x - 10.8}
                           y={district.y + 6}
-                          width="18"
+                          width="21.6"
                           height="5.4"
                           rx="2.7"
                           opacity={district.status === "Stable" && !selected ? "0.72" : "1"}
@@ -489,26 +506,19 @@ export default function SilenceCityMapPage() {
                           x={district.x}
                           y={district.y + 9.7}
                           textAnchor="middle"
-                          fontSize="2.35"
+                          fontSize="2.2"
                           fontWeight="900"
                           fill={selected ? "rgba(15,23,42,1)" : "rgba(226,232,240,0.88)"}
                           className="select-none"
                         >
                           {district.name}
                         </text>
-
-
                       </g>
                     );
                   })}
 
-                  {/* route gate symbol */}
-                  <path d="M42 97 L42 88 C42 83, 47 80, 52 80 C57 80, 62 83, 62 88 L62 97" fill="none" stroke="rgba(251,191,36,0.26)" strokeWidth="1.1" />
-                  <text x="52" y="86" textAnchor="middle" fill="rgba(251,191,36,0.36)" fontSize="3" fontWeight="900">GATE</text>
-
-                  {/* map annotations */}
-                  <text x="42" y="6" fill="rgba(226,232,240,0.18)" fontSize="3" fontWeight="800">NORTH RUINS</text>
-                  <text x="36" y="99" fill="rgba(251,191,36,0.32)" fontSize="3" fontWeight="900">ROUTE GATE CORRIDOR</text>
+                  <text x="39" y="6" fill="rgba(226,232,240,0.16)" fontSize="3" fontWeight="800">NORTHERN RUINS</text>
+                  <text x="34" y="99" fill="rgba(251,191,36,0.28)" fontSize="3" fontWeight="900">ROUTE GATE CORRIDOR</text>
                 </svg>
 
                 <div className="absolute bottom-3 left-3 rounded-2xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs text-slate-300 backdrop-blur">
