@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.4";
+const version = "3.0.5";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -642,16 +642,6 @@ export default function SilenceCityMapPage() {
                   />
 
                   {/* route gate destination glow */}
-                  <text
-                    x="50"
-                    y="83.5"
-                    textAnchor="middle"
-                    fill="rgba(251,191,36,0.30)"
-                    fontSize="2.7"
-                    fontWeight="900"
-                  >
-                    GATE
-                  </text>
 
                   {/* district map markers */}
                   {districts.map((district) => {
