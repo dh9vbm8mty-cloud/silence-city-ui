@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.6";
+const version = "3.0.8";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -631,15 +631,6 @@ export default function SilenceCityMapPage() {
                   {/* outer command boundary */}
 
                   {/* subtle civic core radius */}
-                  <circle
-                    cx="50"
-                    cy="42"
-                    r="16"
-                    fill="none"
-                    stroke="rgba(251,191,36,0.08)"
-                    strokeWidth="0.7"
-                    strokeDasharray="2.5 4"
-                  />
 
                   {/* route gate destination glow */}
 
@@ -665,18 +656,6 @@ export default function SilenceCityMapPage() {
                             fill="rgba(248,113,113,0.07)"
                             stroke="rgba(248,113,113,0.24)"
                             strokeWidth="0.45"
-                          />
-                        )}
-
-                        {isRouteGate && (
-                          <circle
-                            cx={district.x}
-                            cy={district.y}
-                            r={markerRadius + 3.4}
-                            fill={canOpenRouteGate ? "rgba(251,191,36,0.10)" : "rgba(148,163,184,0.07)"}
-                            stroke={canOpenRouteGate ? "rgba(251,191,36,0.55)" : "rgba(148,163,184,0.30)"}
-                            strokeWidth="0.6"
-                            strokeDasharray={canOpenRouteGate ? "0" : "1.2 1.2"}
                           />
                         )}
 
