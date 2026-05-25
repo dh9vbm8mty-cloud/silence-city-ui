@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.12";
+const version = "3.1.0";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -236,6 +236,70 @@ function applyDelta(resources: CityResources, delta: ResourceDelta): CityResourc
   };
 }
 
+function worsenDistrictStatus(status: DistrictStatus): DistrictStatus {
+  if (status === "Stable") return "Strained";
+  if (status === "Strained") return "Critical";
+  return status;
+}
+
+function applyDailyPressure(districts: District[], resources: CityResources) {
+  const pressureTargets: Array<{ id: string; reason: string }> = [];
+
+  if (resources.Power < 35) {
+    pressureTargets.push({
+      id: resources.Power < 34 ? "power-hub" : "ai-core",
+      reason: "Power instability increased civic system pressure.",
+    });
+  }
+
+  if (resources.Supplies <= 0) {
+    pressureTargets.push({
+      id: "clinic",
+      reason: "Supply shortage increased medical pressure.",
+    });
+  }
+
+  if (resources.Trust < 2) {
+    pressureTargets.push({
+      id: "housing",
+      reason: "Low public trust increased residential pressure.",
+    });
+  }
+
+  if (resources.Data < 1) {
+    pressureTargets.push({
+      id: "archive",
+      reason: "Missing civic records increased archive pressure.",
+    });
+  }
+
+  if (pressureTargets.length === 0) {
+    return {
+      nextDistricts: districts,
+      pressureLog: "No major city pressure escalation today.",
+    };
+  }
+
+  const applied = pressureTargets[0];
+
+  const nextDistricts = districts.map((district) => {
+    if (district.id !== applied.id) return district;
+    if (district.id === "route-gate") return district;
+
+    return {
+      ...district,
+      status: worsenDistrictStatus(district.status),
+    };
+  });
+
+  const targetName = districts.find((district) => district.id === applied.id)?.name ?? applied.id;
+
+  return {
+    nextDistricts,
+    pressureLog: `${applied.reason} ${targetName} worsened.`,
+  };
+}
+
 function canAffordDelta(resources: CityResources, delta: ResourceDelta) {
   return (Object.keys(delta) as Array<keyof CityResources>).every((key) => {
     const value = delta[key] ?? 0;
@@ -322,6 +386,7 @@ export default function SilenceCityMapPage() {
   const [routeGateOpened, setRouteGateOpened] = useState(false);
   const [resources, setResources] = useState<CityResources>(startingResources);
   const [lastDelta, setLastDelta] = useState<ResourceDelta>({});
+  const [lastPressureLog, setLastPressureLog] = useState("No pressure escalation yet.");
   const [districts, setDistricts] = useState(startingDistricts);
   const [timeline, setTimeline] = useState<string[]>([
     "Day 3: Housing Block stabilized resident cooperation.",
@@ -457,9 +522,14 @@ export default function SilenceCityMapPage() {
 
   function continueToNextDay() {
     const nextDay = day + 1;
+    const pressureResult = applyDailyPressure(districts, resources);
+
     setDay(nextDay);
     setSubmitted(false);
     setLastDelta({});
+    setDistricts(pressureResult.nextDistricts);
+    setLastPressureLog(pressureResult.pressureLog);
+    setTimeline((items) => [`Day ${nextDay}: ${pressureResult.pressureLog}`, ...items]);
 
     if (nextDay > 14 && !routeGateOpened) {
       setScreen("failure");
@@ -468,7 +538,7 @@ export default function SilenceCityMapPage() {
 
     setScreen("decision");
 
-    const current = districts.find((district) => district.id === selectedDistrictId) ?? districts[0];
+    const current = pressureResult.nextDistricts.find((district) => district.id === selectedDistrictId) ?? pressureResult.nextDistricts[0];
     setSelectedRole(current.recommendedRoles[0]);
     setSelectedAction(current.actions[0]);
   }
@@ -556,6 +626,13 @@ export default function SilenceCityMapPage() {
                 {recommendedDistrict ? `${recommendedDistrict.icon} ${recommendedDistrict.name}` : "Route Gate"} — {recommendedNextMove.title}
               </span>{" "}
               {recommendedNextMove.reason}
+            </p>
+          </div>
+
+          <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/35 px-3 py-2">
+            <p className="text-xs leading-5 text-slate-400">
+              <span className="font-black uppercase tracking-wide text-red-300">City Pressure:</span>{" "}
+              {lastPressureLog}
             </p>
           </div>
         </section>
@@ -924,6 +1001,13 @@ export default function SilenceCityMapPage() {
                     </span>
                   ))}
                 </div>
+              </div>
+
+              <div className="mt-3 rounded-2xl border border-amber-300 bg-white/70 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Next Day Pressure</p>
+                <p className="mt-1 text-sm font-bold text-slate-800">
+                  City pressure will update when you continue to the next day.
+                </p>
               </div>
 
               <div className="mt-3 rounded-2xl border border-amber-300 bg-white/70 p-4">
