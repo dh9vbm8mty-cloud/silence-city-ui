@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.7.0";
+const version = "2.8.0";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -268,6 +268,23 @@ function getResourceIcon(key: keyof CityResources) {
   return "•";
 }
 
+function describeResourceDelta(key: keyof CityResources, value: number) {
+  const direction = value > 0 ? "gains" : "spends";
+  const amount = Math.abs(value);
+
+  if (key === "Power") return `${direction} ${amount} Power — improves city energy stability.`;
+  if (key === "Supplies") return `${direction} ${amount} Supplies — changes stored materials.`;
+  if (key === "Data") return `${direction} ${amount} Data — restores records needed for gate logic.`;
+  if (key === "Structure") return `${direction} ${amount} Structure — improves physical repair capacity.`;
+  if (key === "Trust") return `${direction} ${amount} Trust — improves civic cooperation.`;
+  if (key === "Gate") return `${direction} ${amount} Gate — advances Route Gate readiness.`;
+  return `${direction} ${amount} ${key}.`;
+}
+
+function getDeltaEntries(delta: ResourceDelta) {
+  return Object.entries(delta).filter(([, value]) => value !== 0) as Array<[keyof CityResources, number]>;
+}
+
 function getRoleIcon(roleName: string) {
   return roles.find((role) => role.name === roleName)?.icon ?? "•";
 }
@@ -321,6 +338,39 @@ export default function SilenceCityMapPage() {
     resources.Structure >= 2 ? null : `Structure ${resources.Structure}/2`,
     resources.Trust >= 2 ? null : `Trust ${resources.Trust}/2`,
   ].filter(Boolean) as string[];
+
+  const recommendedNextMove =
+    resources.Data < 1
+      ? {
+          districtId: "archive",
+          title: "Recover Data Fragment",
+          reason: "Data is required before the Route Gate can be opened.",
+        }
+      : resources.Power < 35
+        ? {
+            districtId: "power-hub",
+            title: "Stabilize Relay Grid",
+            reason: "Power must reach 35+ for Route Gate opening.",
+          }
+        : resources.Trust < 2
+          ? {
+              districtId: "housing",
+              title: "Hold Civic Meeting",
+              reason: "Trust must reach 2+ to keep the opening politically stable.",
+            }
+          : resources.Gate < 7
+            ? {
+                districtId: "route-gate",
+                title: "Prepare Route Gate",
+                reason: "Gate readiness must reach 7/7.",
+              }
+            : {
+                districtId: "route-gate",
+                title: "Open Route Gate",
+                reason: "All core requirements are ready.",
+              };
+
+  const recommendedDistrict = districts.find((district) => district.id === recommendedNextMove.districtId);
   const campaignFailed = day > 14 && !routeGateOpened;
   const daysRemaining = Math.max(0, 14 - day);
 
@@ -449,7 +499,7 @@ export default function SilenceCityMapPage() {
               Stabilize the city through daily missions.
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-              Select a district, dispatch a role, execute the mission, and open the Route Gate before Day 14 ends.
+              Choose daily missions to restore the city. Build the required resources and open the Route Gate before Day 14 ends.
             </p>
           </div>
 
@@ -485,6 +535,53 @@ export default function SilenceCityMapPage() {
             </div>
           </div>
         </header>
+
+        <section className="mb-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">Campaign Objective</p>
+            <h2 className="mt-2 text-xl font-black text-white">Open the Route Gate before Day 14 ends.</h2>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <div className={`rounded-2xl border px-3 py-2 ${resources.Gate >= 7 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
+                <p className="text-xs font-bold text-slate-400">Gate Readiness</p>
+                <p className="font-black text-white">{resources.Gate}/7</p>
+              </div>
+              <div className={`rounded-2xl border px-3 py-2 ${resources.Power >= 35 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
+                <p className="text-xs font-bold text-slate-400">Power Required</p>
+                <p className="font-black text-white">{resources.Power}/35</p>
+              </div>
+              <div className={`rounded-2xl border px-3 py-2 ${resources.Data >= 1 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
+                <p className="text-xs font-bold text-slate-400">Data Required</p>
+                <p className="font-black text-white">{resources.Data}/1</p>
+              </div>
+              <div className={`rounded-2xl border px-3 py-2 ${resources.Structure >= 2 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
+                <p className="text-xs font-bold text-slate-400">Structure Required</p>
+                <p className="font-black text-white">{resources.Structure}/2</p>
+              </div>
+              <div className={`rounded-2xl border px-3 py-2 ${resources.Trust >= 2 ? "border-emerald-400 bg-emerald-950/40" : "border-slate-700 bg-slate-800"}`}>
+                <p className="text-xs font-bold text-slate-400">Trust Required</p>
+                <p className="font-black text-white">{resources.Trust}/2</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-sky-300">Recommended Next Move</p>
+            <h2 className="mt-2 text-xl font-black text-white">
+              {recommendedDistrict ? `${recommendedDistrict.icon} ${recommendedDistrict.name}` : "Route Gate"}
+            </h2>
+            <p className="mt-2 text-sm font-black text-sky-100">{recommendedNextMove.title}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">{recommendedNextMove.reason}</p>
+
+            <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-800 p-3">
+              <p className="text-xs font-black uppercase tracking-wide text-slate-400">How to Play</p>
+              <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm leading-6 text-slate-300">
+                <li>Select a district under pressure.</li>
+                <li>Choose a role and action.</li>
+                <li>Build enough resources to open the Route Gate.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
 
         {screen === "decision" ? (
           <section className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
@@ -745,7 +842,7 @@ export default function SilenceCityMapPage() {
                     {canOpenRouteGate ? "Gate is ready to open." : "Gate is still sealed."}
                   </h3>
                   <p className="mt-2 text-sm font-bold leading-6 text-slate-700">
-                    The Route Gate is the campaign objective, not a normal district mission.
+                    The Route Gate is the final campaign objective. It does not use normal district dispatch actions.
                   </p>
 
                   {!canOpenRouteGate && (
@@ -820,7 +917,17 @@ export default function SilenceCityMapPage() {
                 <p className="mt-2 text-xs leading-5 text-slate-400">{missionRisk}</p>
                 <div className="mt-3 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2">
                   <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">Expected Effects</p>
-                  <p className="mt-1 text-xs font-bold text-slate-200">{currentDeltaText.join(" · ")}</p>
+                  <div className="mt-2 space-y-1">
+                    {getDeltaEntries(currentDelta).length > 0 ? (
+                      getDeltaEntries(currentDelta).map(([key, value]) => (
+                        <p key={key} className="text-xs font-bold leading-5 text-slate-200">
+                          {getResourceIcon(key)} {value > 0 ? "+" : ""}{value} {key} — {describeResourceDelta(key, value).split(" — ")[1]}
+                        </p>
+                      ))
+                    ) : (
+                      <p className="text-xs font-bold text-slate-200">{currentDeltaText.join(" · ")}</p>
+                    )}
+                  </div>
                   {!currentCanAfford && (
                     <p className="mt-2 text-xs font-black text-red-300">
                       Insufficient resources for this order.
