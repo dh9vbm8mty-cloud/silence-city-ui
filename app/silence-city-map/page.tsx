@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.6.1";
+const version = "2.6.2";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -243,6 +243,14 @@ function applyDelta(resources: CityResources, delta: ResourceDelta): CityResourc
   };
 }
 
+function canAffordDelta(resources: CityResources, delta: ResourceDelta) {
+  return (Object.keys(delta) as Array<keyof CityResources>).every((key) => {
+    const value = delta[key] ?? 0;
+    if (value >= 0) return true;
+    return resources[key] + value >= 0;
+  });
+}
+
 function formatDelta(delta: ResourceDelta) {
   const entries = Object.entries(delta).filter(([, value]) => value !== 0);
   if (entries.length === 0) return ["No direct resource change."];
@@ -301,6 +309,7 @@ export default function SilenceCityMapPage() {
 
   const currentDelta = getActionDelta(selectedAction, resources);
   const currentDeltaText = formatDelta(currentDelta);
+  const currentCanAfford = canAffordDelta(resources, currentDelta);
 
 
   function selectDistrict(district: District) {
@@ -309,14 +318,17 @@ export default function SilenceCityMapPage() {
     setSelectedRole(district.recommendedRoles[0]);
     setSelectedAction(district.actions[0]);
     setSubmitted(false);
+    setLastDelta({});
   }
 
   function submitDecision() {
+    if (!currentCanAfford) return;
     setSubmitted(true);
   }
 
   function endDay() {
     if (!submitted) return;
+    if (!canAffordDelta(resources, getActionDelta(selectedAction, resources))) return;
 
     const missionDelta = getActionDelta(selectedAction, resources);
     const nextResources = applyDelta(resources, missionDelta);
@@ -721,19 +733,27 @@ export default function SilenceCityMapPage() {
                 <div className="mt-3 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2">
                   <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">Expected Effects</p>
                   <p className="mt-1 text-xs font-bold text-slate-200">{currentDeltaText.join(" · ")}</p>
+                  {!currentCanAfford && (
+                    <p className="mt-2 text-xs font-black text-red-300">
+                      Insufficient resources for this order.
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="mt-5 grid gap-2">
                 <button
                   onClick={submitDecision}
+                  disabled={!currentCanAfford}
                   className={`rounded-2xl px-4 py-3 text-sm font-black transition ${
-                    submitted
-                      ? "bg-emerald-500 text-slate-950"
-                      : "bg-white text-slate-950 hover:bg-slate-200"
+                    !currentCanAfford
+                      ? "cursor-not-allowed bg-slate-800 text-slate-500"
+                      : submitted
+                        ? "bg-emerald-500 text-slate-950"
+                        : "bg-white text-slate-950 hover:bg-slate-200"
                   }`}
                 >
-                  {submitted ? "Order Confirmed ✓" : "Confirm Order"}
+                  {!currentCanAfford ? "Insufficient Resources" : submitted ? "Order Confirmed ✓" : "Confirm Order"}
                 </button>
 
                 <button
@@ -748,7 +768,11 @@ export default function SilenceCityMapPage() {
                   Execute Mission
                 </button>
                 <p className="text-center text-xs text-slate-500">
-                  {submitted ? "Order confirmed. Execute when ready." : "Confirm the order before execution."}
+                  {!currentCanAfford
+                    ? "Choose another action or gain more resources first."
+                    : submitted
+                      ? "Order confirmed. Execute when ready."
+                      : "Confirm the order before execution."}
                 </p>
               </div>
             </aside>
