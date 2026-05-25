@@ -13,7 +13,7 @@ const roles = {
     actions: ["Stabilize Power", "Repair Infrastructure", "Support Market Setup"],
   },
   Exploration: {
-    icon: "🧭",
+    icon: "🥾",
     identity: "Searches unsafe edges of the district for resources, signals, and usable routes.",
     focus: "Best for recovering Scrap, Data, and route knowledge.",
     risk: "Can expose the district to Security pressure when risks are pushed too hard.",
