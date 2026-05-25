@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.8";
+const version = "2.9.1";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -583,11 +583,6 @@ export default function SilenceCityMapPage() {
                       <stop offset="100%" stopColor="rgba(56,189,248,0)" />
                     </radialGradient>
 
-                    <radialGradient id="gateBlob" cx="50%" cy="50%" r="60%">
-                      <stop offset="0%" stopColor="rgba(251,191,36,0.12)" />
-                      <stop offset="100%" stopColor="rgba(251,191,36,0)" />
-                    </radialGradient>
-
                     <filter id="softGlow">
                       <feGaussianBlur stdDeviation="1.4" result="blur" />
                       <feMerge>
@@ -604,7 +599,6 @@ export default function SilenceCityMapPage() {
                   {/* abstract zone atmosphere only, not roads */}
                   <ellipse cx="48" cy="19" rx="34" ry="17" fill="url(#northBlob)" opacity="0.48" />
                   <ellipse cx="74" cy="55" rx="23" ry="25" fill="url(#eastBlob)" opacity="0.38" />
-                  <ellipse cx="50" cy="91" rx="28" ry="15" fill="url(#gateBlob)" opacity="0.50" />
 
                   {/* irregular ruined city zones, background only */}
                   <g fill="rgba(30,41,59,0.105)" stroke="rgba(148,163,184,0.085)" strokeWidth="0.38" strokeDasharray="1.4 2.6">
@@ -626,14 +620,6 @@ export default function SilenceCityMapPage() {
                   />
 
                   {/* route gate destination glow */}
-                  <circle
-                    cx="50"
-                    cy="90"
-                    r="10"
-                    fill="rgba(251,191,36,0.045)"
-                    stroke="rgba(251,191,36,0.14)"
-                    strokeWidth="0.55"
-                  />
                   <text
                     x="50"
                     y="83.5"
@@ -655,36 +641,15 @@ export default function SilenceCityMapPage() {
                         className="cursor-pointer transition"
                       >
                         {selected && (
-                          <>
-                            <circle
-                              cx={district.x}
-                              cy={district.y}
-                              r="8"
-                              fill="rgba(251,191,36,0.16)"
-                              stroke="rgba(251,191,36,0.44)"
-                              strokeWidth="0.55"
-                              filter="url(#softGlow)"
-                            />
-                            <rect
-                              x={district.x - 7.2}
-                              y={district.y - 13.8}
-                              width="14.4"
-                              height="4.2"
-                              rx="2.1"
-                              fill="rgba(251,191,36,0.92)"
-                            />
-                            <text
-                              x={district.x}
-                              y={district.y - 10.8}
-                              textAnchor="middle"
-                              fontSize="2.4"
-                              fontWeight="900"
-                              fill="rgba(15,23,42,1)"
-                              className="select-none"
-                            >
-                              SELECTED
-                            </text>
-                          </>
+                          <circle
+                            cx={district.x}
+                            cy={district.y}
+                            r="7.2"
+                            fill="rgba(14,165,233,0.08)"
+                            stroke="rgba(186,230,253,0.72)"
+                            strokeWidth="0.55"
+                            filter="url(#softGlow)"
+                          />
                         )}
 
                         {district.status === "Critical" && !selected && (
@@ -697,15 +662,6 @@ export default function SilenceCityMapPage() {
                             strokeWidth="0.45"
                           />
                         )}
-
-                        <circle
-                          cx={district.x}
-                          cy={district.y}
-                          r={getMarkerRadius(district.status, selected)}
-                          opacity={getMarkerOpacity(district.status, selected)}
-                          className={`${selected ? "fill-amber-200" : "fill-slate-900/95"} ${markerRingClass[district.status]}`}
-                          strokeWidth={selected ? "1.05" : district.status === "Critical" ? "1.05" : "0.75"}
-                        />
 
                         <text
                           x={district.x}
@@ -728,18 +684,6 @@ export default function SilenceCityMapPage() {
                           stroke={selected ? "rgba(251,191,36,0.72)" : "rgba(148,163,184,0.13)"}
                           strokeWidth="0.5"
                         />
-
-                        <text
-                          x={district.x}
-                          y={district.y + 9.7}
-                          textAnchor="middle"
-                          fontSize="2.04"
-                          fontWeight="900"
-                          fill={selected ? "rgba(15,23,42,1)" : "rgba(226,232,240,0.88)"}
-                          className="select-none"
-                        >
-                          {district.name}
-                        </text>
                       </g>
                     );
                   })}
