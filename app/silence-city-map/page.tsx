@@ -19,7 +19,7 @@ type District = {
   points: string;
 };
 
-const version = "2.1.1";
+const version = "2.1.3";
 
 const roles = [
   { name: "Engineering", icon: "🛠️" },
@@ -166,6 +166,13 @@ const statusDot: Record<DistrictStatus, string> = {
   Strained: "bg-amber-500",
   Critical: "bg-red-500",
   Locked: "bg-slate-500",
+};
+
+const markerRingClass: Record<DistrictStatus, string> = {
+  Stable: "stroke-emerald-400",
+  Strained: "stroke-amber-400",
+  Critical: "stroke-red-400",
+  Locked: "stroke-slate-400",
 };
 
 function getRoleIcon(roleName: string) {
@@ -376,9 +383,9 @@ export default function SilenceCityMapPage() {
                         <circle
                           cx={district.x}
                           cy={district.y}
-                          r={selected ? 5.3 : 4.6}
-                          className={selected ? "fill-amber-200 stroke-slate-950" : "fill-slate-900/95 stroke-slate-300/70"}
-                          strokeWidth="0.9"
+                          r={selected ? 5.5 : 4.8}
+                          className={`${selected ? "fill-amber-200" : "fill-slate-900/95"} ${markerRingClass[district.status]}`}
+                          strokeWidth={selected ? "1.8" : "1.35"}
                         />
 
                         <text
@@ -414,12 +421,7 @@ export default function SilenceCityMapPage() {
                           {district.name}
                         </text>
 
-                        <circle
-                          cx={district.x + 5.6}
-                          cy={district.y - 5.2}
-                          r="1.5"
-                          className={district.status === "Stable" ? "fill-emerald-400" : district.status === "Strained" ? "fill-amber-400" : district.status === "Critical" ? "fill-red-400" : "fill-slate-400"}
-                        />
+
                       </g>
                     );
                   })}
@@ -430,10 +432,10 @@ export default function SilenceCityMapPage() {
                 </svg>
 
                 <div className="absolute bottom-3 left-3 rounded-2xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs text-slate-300 backdrop-blur">
-                  <span className="mr-2 inline-block h-2 w-2 rounded-full bg-emerald-400" />Stable
-                  <span className="ml-3 mr-2 inline-block h-2 w-2 rounded-full bg-amber-400" />Strained
-                  <span className="ml-3 mr-2 inline-block h-2 w-2 rounded-full bg-red-400" />Critical
-                  <span className="ml-3 mr-2 inline-block h-2 w-2 rounded-full bg-slate-400" />Locked
+                  <span className="mr-2 inline-block h-3 w-3 rounded-full border-2 border-emerald-400" />Stable
+                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border-2 border-amber-400" />Strained
+                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border-2 border-red-400" />Critical
+                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border-2 border-slate-400" />Locked
                 </div>
               </div>
             </div>
