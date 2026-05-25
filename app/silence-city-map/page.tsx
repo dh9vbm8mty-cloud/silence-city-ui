@@ -19,7 +19,7 @@ type District = {
   points: string;
 };
 
-const version = "2.2.2";
+const version = "2.2.3";
 
 const roles = [
   { name: "Engineering", icon: "🛠️" },
@@ -179,6 +179,20 @@ function getRoleIcon(roleName: string) {
   return roles.find((role) => role.name === roleName)?.icon ?? "•";
 }
 
+function getMarkerRadius(status: DistrictStatus, selected: boolean) {
+  if (selected) return 5.35;
+  if (status === "Critical") return 5.05;
+  if (status === "Locked") return 4.9;
+  if (status === "Strained") return 4.7;
+  return 4.45;
+}
+
+function getMarkerOpacity(status: DistrictStatus, selected: boolean) {
+  if (selected) return "1";
+  if (status === "Stable") return "0.72";
+  return "0.94";
+}
+
 export default function SilenceCityMapPage() {
   const [screen, setScreen] = useState<ScreenState>("decision");
   const [day, setDay] = useState(4);
@@ -292,7 +306,7 @@ export default function SilenceCityMapPage() {
               Silence City — Map Command Prototype v{version}
             </p>
             <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-4xl">
-              Rebuild the city through daily missions.
+              Stabilize the city through daily missions.
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-300">
               Select a district, dispatch a role, execute the mission, and watch the city change.
@@ -328,7 +342,7 @@ export default function SilenceCityMapPage() {
                 </p>
               </div>
 
-              <div className="relative min-h-[600px] overflow-hidden rounded-3xl border border-slate-700 bg-[#07111f] shadow-inner">
+              <div className="relative min-h-[600px] overflow-hidden rounded-3xl border border-slate-700 bg-[#050b14] shadow-inner">
                 <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                   <defs>
                     <radialGradient id="cityGlow" cx="50%" cy="45%" r="55%">
@@ -343,7 +357,7 @@ export default function SilenceCityMapPage() {
 
                   {/* deep map background */}
                   <rect x="0" y="0" width="100" height="100" fill="url(#cityGlow)" />
-                  <rect x="0" y="0" width="100" height="100" fill="url(#smallGrid)" opacity="0.28" />
+                  <rect x="0" y="0" width="100" height="100" fill="url(#smallGrid)" opacity="0.18" />
 
                   {/* ruined city boundary */}
                   <path
@@ -428,12 +442,25 @@ export default function SilenceCityMapPage() {
                           </>
                         )}
 
+                        {/* Critical district pulse */}
+                        {district.status === "Critical" && !selected && (
+                          <circle
+                            cx={district.x}
+                            cy={district.y}
+                            r="7.2"
+                            fill="rgba(248,113,113,0.08)"
+                            stroke="rgba(248,113,113,0.24)"
+                            strokeWidth="0.45"
+                          />
+                        )}
+
                         <circle
                           cx={district.x}
                           cy={district.y}
-                          r={selected ? 5.25 : 4.65}
+                          r={getMarkerRadius(district.status, selected)}
+                          opacity={getMarkerOpacity(district.status, selected)}
                           className={`${selected ? "fill-amber-200" : "fill-slate-900/95"} ${markerRingClass[district.status]}`}
-                          strokeWidth={selected ? "1.05" : "0.85"}
+                          strokeWidth={selected ? "1.05" : district.status === "Critical" ? "1.05" : "0.75"}
                         />
 
                         <text
@@ -452,6 +479,7 @@ export default function SilenceCityMapPage() {
                           width="18"
                           height="5.4"
                           rx="2.7"
+                          opacity={district.status === "Stable" && !selected ? "0.72" : "1"}
                           fill={selected ? "rgba(251,191,36,0.84)" : "rgba(15,23,42,0.68)"}
                           stroke={selected ? "rgba(251,191,36,0.72)" : "rgba(148,163,184,0.16)"}
                           strokeWidth="0.5"
@@ -473,6 +501,10 @@ export default function SilenceCityMapPage() {
                       </g>
                     );
                   })}
+
+                  {/* route gate symbol */}
+                  <path d="M42 97 L42 88 C42 83, 47 80, 52 80 C57 80, 62 83, 62 88 L62 97" fill="none" stroke="rgba(251,191,36,0.26)" strokeWidth="1.1" />
+                  <text x="52" y="86" textAnchor="middle" fill="rgba(251,191,36,0.36)" fontSize="3" fontWeight="900">GATE</text>
 
                   {/* map annotations */}
                   <text x="42" y="6" fill="rgba(226,232,240,0.18)" fontSize="3" fontWeight="800">NORTH RUINS</text>
