@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.4";
+const version = "2.8.5";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -501,7 +501,7 @@ export default function SilenceCityMapPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-5">
-        <header className="mb-3 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
+        <header className="mb-3 rounded-3xl border border-slate-800/70 bg-slate-900/70 p-4 shadow-lg">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">
               Silence City — Map Command Prototype v{version}
@@ -516,7 +516,7 @@ export default function SilenceCityMapPage() {
 
         </header>
 
-        <section className="mb-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-3 shadow-xl">
+        <section className="mb-4 rounded-3xl border border-slate-800/70 bg-slate-900/70 p-3 shadow-lg">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">Command Brief</p>
@@ -532,8 +532,8 @@ export default function SilenceCityMapPage() {
                   key={item.label}
                   className={`rounded-full border px-3 py-1 text-xs font-black ${
                     item.ready
-                      ? "border-emerald-400 bg-emerald-950/50 text-emerald-200"
-                      : "border-slate-700 bg-slate-800 text-slate-300"
+                      ? "border-emerald-400/60 bg-emerald-950/30 text-emerald-200"
+                      : "border-slate-700/60 bg-slate-950/40 text-slate-300"
                   }`}
                 >
                   {item.ready ? "✓" : "•"} {item.label} {item.display}
@@ -542,7 +542,7 @@ export default function SilenceCityMapPage() {
             </div>
           </div>
 
-          <div className="mt-3 rounded-2xl border border-slate-800 bg-slate-950/50 px-3 py-2">
+          <div className="mt-3 rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2">
             <p className="text-xs leading-5 text-slate-400">
               <span className="font-black uppercase tracking-wide text-sky-300">Recommended:</span>{" "}
               <span className="font-bold text-white">
@@ -561,7 +561,7 @@ export default function SilenceCityMapPage() {
                   <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">City Map</p>
                   <h2 className="mt-1 text-xl font-black text-white">Select Target District</h2>
                 </div>
-                <p className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">
+                <p className="rounded-full border border-slate-700/70 bg-slate-800/70 px-3 py-1 text-xs font-bold text-slate-300">
                   Recovery map
                 </p>
               </div>
@@ -784,7 +784,7 @@ export default function SilenceCityMapPage() {
 
             <aside className="rounded-3xl border border-slate-800 bg-slate-900 p-3.5 shadow-xl">
               <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-300">Dispatch Order</p>
-              <div className="mt-3 rounded-3xl border border-slate-700 bg-slate-800 p-3.5">
+              <div className="mt-3 rounded-3xl border border-slate-700/70 bg-slate-800/70 p-3.5">
                 <div className="flex items-center gap-3">
                   <span className="text-4xl">{selectedDistrict.icon}</span>
                   <div>
@@ -799,7 +799,7 @@ export default function SilenceCityMapPage() {
                   <p className="text-xs font-black uppercase tracking-wide text-red-300">Local Crisis</p>
                   <p className="mt-1 text-base font-bold text-white">{selectedDistrict.crisis}</p>
                   <p className="mt-2 text-sm leading-6 text-slate-300">{selectedDistrict.detail}</p>
-                  <p className="mt-2 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold leading-5 text-slate-300">
+                  <p className="mt-2 rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 text-xs font-semibold leading-5 text-slate-300">
                     <span className="font-black text-amber-300">Target Status:</span> {targetStatusHint}
                   </p>
                 </div>
@@ -852,7 +852,7 @@ export default function SilenceCityMapPage() {
                       className={`rounded-2xl border px-3 py-3 text-sm font-bold transition ${
                         selectedRole === role
                           ? "border-amber-300 bg-amber-100 text-slate-950"
-                          : "border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"
+                          : "border-slate-700/70 bg-slate-800/70 text-slate-200 hover:bg-slate-700/80"
                       }`}
                     >
                       <span className="mr-2">{getRoleIcon(role)}</span>
@@ -871,8 +871,8 @@ export default function SilenceCityMapPage() {
                       onClick={() => setSelectedAction(action)}
                       className={`w-full rounded-2xl border px-3 py-3 text-left text-sm font-bold transition ${
                         selectedAction === action
-                          ? "border-sky-300 bg-sky-100 text-slate-950"
-                          : "border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"
+                          ? "border-sky-300/80 bg-sky-950/70 text-sky-100"
+                          : "border-slate-700/70 bg-slate-800/70 text-slate-200 hover:bg-slate-700/80"
                       }`}
                     >
                       {action}
@@ -885,7 +885,7 @@ export default function SilenceCityMapPage() {
                 <p className="text-xs font-black uppercase tracking-wide text-sky-300">Dispatch Preview</p>
                 <p className="mt-1 text-sm font-bold text-white">{missionPreview}</p>
                 <p className="mt-2 text-xs leading-5 text-slate-400">{missionRisk}</p>
-                <div className="mt-3 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2">
+                <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-900/70 px-3 py-2">
                   <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">Expected Effects</p>
                   <div className="mt-2 space-y-1">
                     {getDeltaEntries(currentDelta).length > 0 ? (
@@ -922,7 +922,7 @@ export default function SilenceCityMapPage() {
                   disabled={!currentCanAfford}
                   className={`rounded-2xl px-4 py-3 text-sm font-black transition ${
                     !currentCanAfford
-                      ? "cursor-not-allowed bg-slate-800 text-slate-500"
+                      ? "cursor-not-allowed bg-slate-900/70 text-slate-500"
                       : submitted
                         ? "bg-emerald-500 text-slate-950"
                         : "bg-white text-slate-950 hover:bg-slate-200"
@@ -937,7 +937,7 @@ export default function SilenceCityMapPage() {
                   className={`rounded-2xl px-4 py-3 text-sm font-black transition ${
                     submitted
                       ? "bg-sky-300 text-slate-950 shadow-lg shadow-amber-400/20 hover:bg-amber-200"
-                      : "cursor-not-allowed bg-slate-800 text-slate-500"
+                      : "cursor-not-allowed bg-slate-900/70 text-slate-500"
                   }`}
                 >
                   Execute Mission
@@ -1034,7 +1034,7 @@ export default function SilenceCityMapPage() {
               <h2 className="mt-1 text-xl font-black text-white">City Timeline</h2>
               <div className="mt-4 space-y-2">
                 {timeline.map((item, index) => (
-                  <div key={`${item}-${index}`} className="rounded-2xl border border-slate-700 bg-slate-800 p-3 text-sm text-slate-200">
+                  <div key={`${item}-${index}`} className="rounded-2xl border border-slate-700/70 bg-slate-800/70 p-3 text-sm text-slate-200">
                     {item}
                   </div>
                 ))}
@@ -1097,7 +1097,7 @@ export default function SilenceCityMapPage() {
                 Required: Gate 7/7, Power 35+, Data 1+, Structure 2+, Trust 2+ before Day 14 ends.
               </p>
             </div>
-            <div className="mt-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3" data-note="Map Footer Status">
+            <div className="mt-3 rounded-2xl border border-slate-800/70 bg-slate-950/40 px-4 py-3" data-note="Map Footer Status">
               <div className="flex flex-col gap-2 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
                 <p>
                   <span className="font-black uppercase tracking-wide text-slate-300">Selected:</span>{" "}
