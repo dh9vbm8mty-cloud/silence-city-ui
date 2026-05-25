@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.6";
+const version = "2.8.7";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -168,8 +168,8 @@ const startingDistricts: District[] = [
     detail: "Opening the gate requires power stability, public supplies, verified records, and coordinated approval.",
     recommendedRoles: ["Planner", "Engineering", "AI Systems"],
     actions: ["Inspect Gate", "Prioritize Gate Readiness", "Draft Opening Plan"],
-    x: 52,
-    y: 90,
+    x: 14,
+    y: 14,
     points: "39,84 61,84 72,97 28,97",
   },
 ];
