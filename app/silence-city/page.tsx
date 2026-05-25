@@ -245,6 +245,35 @@ function getOutcomeChangeTextClass(item: string) {
   return "text-slate-600";
 }
 
+function getDistrictStatIcon(label: keyof DistrictStats) {
+  if (label === "Power") return "⚡";
+  if (label === "Infrastructure") return "🏗️";
+  if (label === "Security") return "🛡️";
+  if (label === "AI Stability") return "🧠";
+  return "•";
+}
+
+function getPublicResourceIcon(label: keyof PublicStorage | "Treasury") {
+  if (label === "Scrap") return "🔩";
+  if (label === "Power Cell") return "🔋";
+  if (label === "Data Fragment") return "💾";
+  if (label === "Electronic Component") return "🧩";
+  if (label === "Structural Part") return "🧱";
+  if (label === "Treasury") return "🪙";
+  return "•";
+}
+
+function getRouteGateIcon(label: string) {
+  if (label.includes("Power")) return "⚡";
+  if (label.includes("Scrap")) return "🔩";
+  if (label.includes("Structural")) return "🧱";
+  if (label.includes("Power Cell")) return "🔋";
+  if (label.includes("Data")) return "💾";
+  if (label.includes("Treasury")) return "🪙";
+  if (label.includes("Certified")) return "👥";
+  return "🧭";
+}
+
 function getDistrictPressure(districtStats: DistrictStats, publicStorage: PublicStorage, treasury: number) {
   const pressure: string[] = [];
 
@@ -515,7 +544,7 @@ export default function SilenceCityPage() {
   }
 
   const playtestSnapshot = {
-    version: "1.2.3",
+    version: "1.2.5",
     sessionId,
     playerCode,
     playtestGroup,
@@ -986,7 +1015,7 @@ export default function SilenceCityPage() {
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="rounded-3xl border bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.2.3
+            Silence City — District Council Interface v1.2.5
           </p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
@@ -1033,24 +1062,23 @@ export default function SilenceCityPage() {
           <section className="rounded-3xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-slate-50 p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">First Time?</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🌅 First Time?</p>
                 <h2 className="mt-1 text-2xl font-bold text-slate-950">Guide a damaged district through 14 days.</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                  Each day, choose one civic role and one action. Your goal is to prepare the district to open the Route Gate before Day 14 ends.
+                  Each day: choose one role, choose one action, then end the day.
                 </p>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                  You do not need to maximize every stat. You need enough Power, resources, Treasury, and civic readiness to open the gate.
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+                  Goal: prepare enough Power, resources, Treasury, and readiness to open the Route Gate.
                 </p>
               </div>
 
               <div className="rounded-2xl border bg-slate-50 p-3 lg:min-w-[280px]">
                 <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Start Here</p>
                 <ol className="mt-2 space-y-1 text-sm text-slate-700">
-                  <li><strong>1.</strong> Read today&apos;s problem.</li>
-                  <li><strong>2.</strong> Choose who acts today.</li>
-                  <li><strong>3.</strong> Choose one action.</li>
-                  <li><strong>4.</strong> Submit, then End Day.</li>
-                  <li><strong>5.</strong> Read what changed.</li>
+                  <li><strong>1.</strong> Choose a role.</li>
+                  <li><strong>2.</strong> Choose an action.</li>
+                  <li><strong>3.</strong> Submit → End Day.</li>
+                  <li><strong>4.</strong> Read the result.</li>
                 </ol>
               </div>
             </div>
@@ -1066,7 +1094,7 @@ export default function SilenceCityPage() {
           <section className="rounded-3xl border bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-sm font-bold uppercase tracking-wide text-slate-700">District Brief</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-amber-700">⚠️ District Brief</p>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">Today&apos;s Priority: {civicPriority}</h2>
                 <p className="mt-2 text-sm text-slate-600">{civicPriorityReason}</p>
               </div>
@@ -1079,22 +1107,22 @@ export default function SilenceCityPage() {
             <div className="mb-4 rounded-3xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-slate-50 p-4 shadow-sm">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Mission</p>
+                  <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🎯 Mission</p>
                   <h2 className="mt-1 text-2xl font-bold text-slate-950">Open the Route Gate by Day 14</h2>
                   <p className="mt-1 text-sm text-slate-600">
-                    Route Gate: {visibleRouteGatePassedCount} of {visibleRouteGateChecks.length} requirements met
+                    🧭 Route Gate: {visibleRouteGatePassedCount} of {visibleRouteGateChecks.length} requirements met
                   </p>
                 </div>
 
                 <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[360px]">
                   <div className="rounded-2xl border bg-slate-50 p-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Current Step</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-sky-700">👉 Current Step</p>
                     <p className="mt-1 text-base font-bold text-slate-900">{currentStepText}</p>
                     <p className="mt-1 text-xs text-slate-500">{currentStepDetail}</p>
                   </div>
 
                   <div className="rounded-2xl border bg-slate-50 p-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-amber-700">Route Gate Readiness</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-amber-700">🧭 Route Gate Readiness</p>
                     <p className="mt-1 text-base font-bold text-slate-900">{visibleRouteGatePassedCount} / {visibleRouteGateChecks.length} ready</p>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
                       <div className={`h-full rounded-full ${visibleRouteGatePassedCount === visibleRouteGateChecks.length ? "bg-emerald-500" : "bg-amber-400"}`} style={{ width: `${visibleRouteGateProgress}%` }} />
@@ -1133,10 +1161,10 @@ export default function SilenceCityPage() {
           <section className="rounded-3xl border bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-sm font-bold uppercase tracking-wide text-indigo-700">Step 1 — Choose Who Acts Today</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-indigo-700">🧑‍🔧 Step 1 — Choose Who Acts Today</p>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">Who speaks for the district today?</h2>
                 <p className="mt-2 text-sm text-slate-600">
-                  Select one civic role. Each role opens a different set of district actions.
+                  Pick who acts today. Their actions appear below.
                 </p>
               </div>
             </div>
@@ -1146,15 +1174,15 @@ export default function SilenceCityPage() {
                 <button
                   key={item}
                   onClick={() => changeRole(item)}
-                  className={`rounded-2xl border p-3 text-left text-sm transition ${
+                  className={`rounded-2xl border p-3 text-center text-sm transition ${
                     role === item ? "bg-slate-900 text-white" : "bg-slate-50 hover:bg-white"
                   }`}
                 >
-                  <p className="flex items-center gap-2 font-bold">
+                  <p className="flex items-center justify-center gap-2 font-bold">
                     <span className="text-lg leading-none">{roles[item].icon}</span>
                     <span>{item}</span>
                   </p>
-                  <p className={`mt-2 line-clamp-3 flex-1 text-xs leading-5 ${role === item ? "text-slate-200" : "text-slate-600"}`}>{roles[item].focus}</p>
+
                 </button>
               ))}
             </div>
@@ -1163,9 +1191,9 @@ export default function SilenceCityPage() {
 
         {viewMode === "player" && (
           <section className="grid gap-4 lg:grid-cols-1">
-            <Panel title={`Step 2 — Choose Today’s Action — ${role}`}>
+            <Panel title={`🗳️ Step 2 — Choose Today’s Action — ${role}`}>
               <div className="rounded-2xl border bg-slate-50 p-3 text-sm text-slate-700">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Role Concern</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Selected Role</p>
                 <p className="mt-1 font-semibold text-slate-900">{currentRole.pressure}</p>
                 <p className="mt-2 text-xs text-slate-500">
                   Best use: {currentRole.focus} · Tradeoff: {currentRole.risk}
