@@ -313,6 +313,14 @@ export default function SilenceCityMapPage() {
   const currentCanAfford = canAffordDelta(resources, currentDelta);
   const canOpenRouteGate = resources.Gate >= 7 && resources.Power >= 35 && resources.Data >= 1 && resources.Structure >= 2 && resources.Trust >= 2;
   const routeGateStatusText = routeGateOpened ? "Opened" : canOpenRouteGate ? "Ready" : "Sealed";
+  const selectedIsRouteGate = selectedDistrict.id === "route-gate";
+  const missingGateRequirements = [
+    resources.Gate >= 7 ? null : `Gate readiness ${resources.Gate}/7`,
+    resources.Power >= 35 ? null : `Power ${resources.Power}/35`,
+    resources.Data >= 1 ? null : `Data ${resources.Data}/1`,
+    resources.Structure >= 2 ? null : `Structure ${resources.Structure}/2`,
+    resources.Trust >= 2 ? null : `Trust ${resources.Trust}/2`,
+  ].filter(Boolean) as string[];
   const campaignFailed = day > 14 && !routeGateOpened;
   const daysRemaining = Math.max(0, 14 - day);
 
@@ -326,12 +334,20 @@ export default function SilenceCityMapPage() {
     setLastDelta({});
   }
 
+  function openRouteGate() {
+    if (!canOpenRouteGate) return;
+    setRouteGateOpened(true);
+    setScreen("victory");
+  }
+
   function submitDecision() {
+    if (selectedIsRouteGate) return;
     if (!currentCanAfford) return;
     setSubmitted(true);
   }
 
   function endDay() {
+    if (selectedIsRouteGate) return;
     if (!submitted) return;
     if (!canAffordDelta(resources, getActionDelta(selectedAction, resources))) return;
 
@@ -424,7 +440,7 @@ export default function SilenceCityMapPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-5">
-        <header className="mb-4 grid gap-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl xl:grid-cols-[1fr_auto] xl:items-center">
+        <header className="mb-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">
               Silence City — Map Command Prototype v{version}
@@ -437,7 +453,7 @@ export default function SilenceCityMapPage() {
             </p>
           </div>
 
-          <div className="grid w-full grid-cols-4 gap-2 text-center xl:min-w-[920px] xl:grid-cols-9">
+          <div className="mt-4 grid w-full grid-cols-3 gap-2 text-center sm:grid-cols-5 xl:grid-cols-9">
             <div className="flex h-[58px] flex-col items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 px-2 py-2">
               <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Day</p>
               <p className="mt-0.5 text-base font-black leading-none text-white">{day}/14</p>
@@ -722,6 +738,43 @@ export default function SilenceCityMapPage() {
                 </div>
               </div>
 
+              {selectedIsRouteGate ? (
+                <div className="mt-4 rounded-2xl border border-amber-300 bg-amber-100 p-4 text-slate-950">
+                  <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-700">Route Gate Objective</p>
+                  <h3 className="mt-2 text-xl font-black">
+                    {canOpenRouteGate ? "Gate is ready to open." : "Gate is still sealed."}
+                  </h3>
+                  <p className="mt-2 text-sm font-bold leading-6 text-slate-700">
+                    The Route Gate is the campaign objective, not a normal district mission.
+                  </p>
+
+                  {!canOpenRouteGate && (
+                    <div className="mt-4 rounded-2xl border border-amber-300 bg-white/70 p-3">
+                      <p className="text-xs font-black uppercase tracking-wide text-slate-500">Missing Requirements</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {missingGateRequirements.map((item) => (
+                          <span key={item} className="rounded-full border border-amber-300 bg-white px-3 py-1 text-xs font-black text-slate-800">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={openRouteGate}
+                    disabled={!canOpenRouteGate}
+                    className={`mt-4 w-full rounded-2xl px-4 py-3 text-sm font-black transition ${
+                      canOpenRouteGate
+                        ? "bg-slate-950 text-white hover:bg-slate-800"
+                        : "cursor-not-allowed bg-slate-300 text-slate-500"
+                    }`}
+                  >
+                    {canOpenRouteGate ? "Open Route Gate" : "Route Gate Not Ready"}
+                  </button>
+                </div>
+              ) : (
+                <>
               <div className="mt-4">
                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Dispatch Unit</p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
@@ -819,6 +872,9 @@ export default function SilenceCityMapPage() {
                       : "Confirm the order before execution."}
                 </p>
               </div>
+
+                </>
+              )}
             </aside>
           </section>
         ) : screen === "result" ? (
