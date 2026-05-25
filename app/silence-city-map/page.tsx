@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 type DistrictStatus = "Stable" | "Strained" | "Critical" | "Locked";
-type ScreenState = "decision" | "result" | "victory";
+type ScreenState = "decision" | "result" | "victory" | "failure";
 
 type CityResources = {
   Power: number;
@@ -313,6 +313,8 @@ export default function SilenceCityMapPage() {
   const currentCanAfford = canAffordDelta(resources, currentDelta);
   const canOpenRouteGate = resources.Gate >= 7 && resources.Power >= 35 && resources.Data >= 1 && resources.Structure >= 2 && resources.Trust >= 2;
   const routeGateStatusText = routeGateOpened ? "Opened" : canOpenRouteGate ? "Ready" : "Sealed";
+  const campaignFailed = day > 14 && !routeGateOpened;
+  const daysRemaining = Math.max(0, 14 - day);
 
 
   function selectDistrict(district: District) {
@@ -374,6 +376,12 @@ export default function SilenceCityMapPage() {
     setDay(nextDay);
     setSubmitted(false);
     setLastDelta({});
+
+    if (nextDay > 14 && !routeGateOpened) {
+      setScreen("failure");
+      return;
+    }
+
     setScreen("decision");
 
     const current = districts.find((district) => district.id === selectedDistrictId) ?? districts[0];
@@ -425,14 +433,18 @@ export default function SilenceCityMapPage() {
               Stabilize the city through daily missions.
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-              Select a district, dispatch a role, execute the mission, and watch the city change.
+              Select a district, dispatch a role, execute the mission, and open the Route Gate before Day 14 ends.
             </p>
           </div>
 
-          <div className="grid w-full grid-cols-4 gap-2 text-center xl:min-w-[820px] xl:grid-cols-8">
+          <div className="grid w-full grid-cols-4 gap-2 text-center xl:min-w-[920px] xl:grid-cols-9">
             <div className="flex h-[58px] flex-col items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 px-2 py-2">
               <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Day</p>
               <p className="mt-0.5 text-base font-black leading-none text-white">{day}/14</p>
+            </div>
+            <div className={`flex h-[58px] flex-col items-center justify-center rounded-2xl border px-2 py-2 ${campaignFailed ? "border-red-300 bg-red-100 text-slate-950" : "border-slate-700 bg-slate-800"}`}>
+              <p className={`text-[11px] font-bold uppercase tracking-wide ${campaignFailed ? "text-red-800" : "text-slate-400"}`}>Days Left</p>
+              <p className={`mt-0.5 text-base font-black leading-none ${campaignFailed ? "text-slate-950" : "text-white"}`}>{daysRemaining}</p>
             </div>
             {(Object.keys(resources) as Array<keyof CityResources>).map((key) => (
               <div
@@ -895,7 +907,7 @@ export default function SilenceCityMapPage() {
               </div>
             </div>
           </section>
-        ) : (
+        ) : screen === "victory" ? (
           <section className="rounded-3xl border border-amber-300 bg-amber-100 p-6 text-slate-950 shadow-xl">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-700">Route Gate Opened</p>
             <h2 className="mt-2 text-4xl font-black">The district has opened the Route Gate.</h2>
@@ -921,6 +933,39 @@ export default function SilenceCityMapPage() {
             <button
               onClick={() => {
                 setRouteGateOpened(false);
+                setScreen("decision");
+              }}
+              className="mt-5 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800"
+            >
+              Continue Sandbox
+            </button>
+          </section>
+        ) : (
+          <section className="rounded-3xl border border-red-300 bg-red-100 p-6 text-slate-950 shadow-xl">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-700">Route Gate Failed</p>
+            <h2 className="mt-2 text-4xl font-black">The city missed the Day 14 opening window.</h2>
+            <p className="mt-4 max-w-3xl text-lg font-bold leading-8">
+              The district survived, but it did not assemble enough gate readiness before the campaign clock expired.
+            </p>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {(Object.keys(resources) as Array<keyof CityResources>).map((key) => (
+                <div key={key} className="rounded-2xl border border-red-300 bg-white/70 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{getResourceIcon(key)} {key}</p>
+                  <p className="mt-1 text-2xl font-black">{key === "Gate" ? `${resources[key]}/7` : resources[key]}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-red-300 bg-white/70 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Missing Requirement</p>
+              <p className="mt-1 text-sm font-bold text-slate-700">
+                Required: Gate 7/7, Power 35+, Data 1+, Structure 2+, Trust 2+ before Day 14 ends.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
                 setScreen("decision");
               }}
               className="mt-5 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800"
