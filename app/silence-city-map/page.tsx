@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "3.0.8";
+const version = "3.0.10";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -289,19 +289,6 @@ function getDistrictShortName(district: District) {
   };
 
   return names[district.id] ?? district.name;
-}
-
-function getZonePlateWidth(district: District) {
-  if (district.id === "route-gate") return 27;
-  if (district.id === "old-market") return 26;
-  if (district.id === "power-hub") return 29;
-  if (district.id === "archive") return 30;
-  if (district.id === "ai-core") return 22;
-  if (district.id === "clinic") return 27;
-  if (district.id === "workshop") return 27;
-  if (district.id === "depot") return 28;
-  if (district.id === "housing") return 28;
-  return 28;
 }
 
 function describeResourceDelta(key: keyof CityResources, value: number) {
@@ -648,17 +635,6 @@ export default function SilenceCityMapPage() {
                         onClick={() => selectDistrict(district)}
                         className="cursor-pointer transition"
                       >
-                        {district.status === "Critical" && !selected && (
-                          <circle
-                            cx={district.x}
-                            cy={district.y}
-                            r={markerRadius + 2.8}
-                            fill="rgba(248,113,113,0.07)"
-                            stroke="rgba(248,113,113,0.24)"
-                            strokeWidth="0.45"
-                          />
-                        )}
-
                         <circle
                           cx={district.x}
                           cy={district.y}
