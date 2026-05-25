@@ -30,7 +30,7 @@ type District = {
   points: string;
 };
 
-const version = "2.8.5";
+const version = "2.8.6";
 
 const startingResources: CityResources = {
   Power: 34,
@@ -610,31 +610,11 @@ export default function SilenceCityMapPage() {
 
                   {/* irregular ruined city zones, background only */}
                   <g fill="rgba(30,41,59,0.105)" stroke="rgba(148,163,184,0.085)" strokeWidth="0.38" strokeDasharray="1.4 2.6">
-                    <path d="M15 11 C23 8, 34 9, 43 13 C48 16, 47 24, 41 28 C32 33, 18 31, 11 25 C7 21, 9 14, 15 11Z" />
-                    <path d="M57 11 C67 8, 82 10, 88 17 C93 23, 88 30, 78 32 C67 35, 56 31, 52 24 C49 18, 51 13, 57 11Z" />
-                    <path d="M13 36 C23 32, 38 34, 45 41 C50 47, 45 54, 33 56 C21 58, 10 54, 8 47 C6 42, 8 38, 13 36Z" />
-                    <path d="M55 35 C68 31, 83 34, 91 43 C96 49, 91 57, 79 59 C66 61, 51 56, 48 48 C45 42, 49 37, 55 35Z" />
-                    <path d="M14 63 C25 59, 39 61, 47 69 C52 75, 47 82, 35 84 C23 86, 10 81, 8 73 C7 68, 9 65, 14 63Z" />
-                    <path d="M56 63 C68 60, 84 62, 91 70 C96 76, 90 84, 77 85 C65 87, 51 82, 48 74 C46 69, 50 65, 56 63Z" />
                   </g>
 
                   {/* faint gate corridor terrain */}
-                  <path
-                    d="M39 84 C44 82, 56 82, 61 84 C66 88, 70 94, 72 97 H28 C30 94, 34 88, 39 84Z"
-                    fill="rgba(251,191,36,0.026)"
-                    stroke="rgba(251,191,36,0.07)"
-                    strokeWidth="0.36"
-                    strokeDasharray="1.5 2.7"
-                  />
 
                   {/* outer command boundary */}
-                  <path
-                    d="M9 15 C18 6, 38 6, 51 8 C70 9, 88 18, 92 35 C96 54, 91 80, 77 91 C63 102, 35 99, 20 91 C8 84, 4 62, 6 42 C7 29, 4 21, 9 15Z"
-                    fill="none"
-                    stroke="rgba(148,163,184,0.055)"
-                    strokeWidth="0.42"
-                    strokeDasharray="2 4"
-                  />
 
                   {/* subtle civic core radius */}
                   <circle
@@ -655,12 +635,6 @@ export default function SilenceCityMapPage() {
                     fill="rgba(251,191,36,0.045)"
                     stroke="rgba(251,191,36,0.14)"
                     strokeWidth="0.55"
-                  />
-                  <path
-                    d="M44 98 L44 89 C44 84, 47 82, 50 82 C53 82, 56 84, 56 89 L56 98"
-                    fill="none"
-                    stroke="rgba(251,191,36,0.20)"
-                    strokeWidth="0.6"
                   />
                   <text
                     x="50"
