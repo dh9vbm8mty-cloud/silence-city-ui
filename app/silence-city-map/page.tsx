@@ -19,7 +19,7 @@ type District = {
   points: string;
 };
 
-const version = "2.1.3";
+const version = "2.1.4";
 
 const roles = [
   { name: "Engineering", icon: "🛠️" },
@@ -373,26 +373,26 @@ export default function SilenceCityMapPage() {
                           <circle
                             cx={district.x}
                             cy={district.y}
-                            r="8.2"
-                            fill="rgba(251,191,36,0.18)"
-                            stroke="rgba(251,191,36,0.48)"
-                            strokeWidth="0.8"
+                            r="7.6"
+                            fill="rgba(251,191,36,0.13)"
+                            stroke="rgba(251,191,36,0.36)"
+                            strokeWidth="0.55"
                           />
                         )}
 
                         <circle
                           cx={district.x}
                           cy={district.y}
-                          r={selected ? 5.5 : 4.8}
+                          r={selected ? 5.25 : 4.65}
                           className={`${selected ? "fill-amber-200" : "fill-slate-900/95"} ${markerRingClass[district.status]}`}
-                          strokeWidth={selected ? "1.8" : "1.35"}
+                          strokeWidth={selected ? "1.05" : "0.85"}
                         />
 
                         <text
                           x={district.x}
                           y={district.y + 1.25}
                           textAnchor="middle"
-                          fontSize="4.3"
+                          fontSize="4.05"
                           className="select-none"
                         >
                           {district.icon}
@@ -404,8 +404,8 @@ export default function SilenceCityMapPage() {
                           width="18"
                           height="5.4"
                           rx="2.7"
-                          fill={selected ? "rgba(251,191,36,0.92)" : "rgba(15,23,42,0.78)"}
-                          stroke={selected ? "rgba(251,191,36,0.9)" : "rgba(148,163,184,0.22)"}
+                          fill={selected ? "rgba(251,191,36,0.84)" : "rgba(15,23,42,0.68)"}
+                          stroke={selected ? "rgba(251,191,36,0.72)" : "rgba(148,163,184,0.16)"}
                           strokeWidth="0.5"
                         />
 
@@ -432,10 +432,10 @@ export default function SilenceCityMapPage() {
                 </svg>
 
                 <div className="absolute bottom-3 left-3 rounded-2xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs text-slate-300 backdrop-blur">
-                  <span className="mr-2 inline-block h-3 w-3 rounded-full border-2 border-emerald-400" />Stable
-                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border-2 border-amber-400" />Strained
-                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border-2 border-red-400" />Critical
-                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border-2 border-slate-400" />Locked
+                  <span className="mr-2 inline-block h-3 w-3 rounded-full border border-emerald-400" />Stable
+                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border border-amber-400" />Strained
+                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border border-red-400" />Critical
+                  <span className="ml-3 mr-2 inline-block h-3 w-3 rounded-full border border-slate-400" />Locked
                 </div>
               </div>
             </div>
