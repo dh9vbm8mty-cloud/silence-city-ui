@@ -384,6 +384,7 @@ export default function SilenceCityMapPage() {
   const [selectedAction, setSelectedAction] = useState("Recover Data Fragment");
   const [submitted, setSubmitted] = useState(false);
   const [showOpeningBrief, setShowOpeningBrief] = useState(true);
+  const [dismissedFirstOrderHintDay, setDismissedFirstOrderHintDay] = useState<number | null>(null);
   const [routeGateOpened, setRouteGateOpened] = useState(false);
   const [resources, setResources] = useState<CityResources>(startingResources);
   const [lastDelta, setLastDelta] = useState<ResourceDelta>({});
@@ -446,6 +447,7 @@ export default function SilenceCityMapPage() {
               };
 
   const recommendedDistrict = districts.find((district) => district.id === recommendedNextMove.districtId);
+  const showFirstOrderHint = screen === "decision" && !routeGateOpened && dismissedFirstOrderHintDay !== day && recommendedDistrict;
 
   const commandResourceStatus = [
     { label: "Day", value: day, target: 14, ready: day <= 14, display: `${day}/14` },
@@ -478,6 +480,19 @@ export default function SilenceCityMapPage() {
     if (selectedIsRouteGate) return;
     if (!currentCanAfford) return;
     setSubmitted(true);
+  }
+
+  function acceptFirstOrderHint() {
+    if (!recommendedDistrict) return;
+
+    setSelectedDistrictId(recommendedDistrict.id);
+    setSelectedRole(recommendedDistrict.recommendedRoles[0]);
+    setSelectedAction(
+      recommendedDistrict.actions.find((action) => action === recommendedNextMove.title) ?? recommendedDistrict.actions[0]
+    );
+    setSubmitted(false);
+    setLastDelta({});
+    setDismissedFirstOrderHintDay(day);
   }
 
   function endDay() {
@@ -641,13 +656,20 @@ export default function SilenceCityMapPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <div data-note="Visible First Order Guide" className="fixed right-4 top-4 z-[9999] max-w-sm rounded-2xl border border-sky-300/50 bg-slate-900/95 p-4 text-white shadow-2xl backdrop-blur">
-        <p className="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Recommended First Order</p>
-        <p className="mt-2 text-sm font-black text-white">Start with ⚡ Power Relay Yard or 🧠 Civic AI Core.</p>
-        <p className="mt-1 text-xs leading-5 text-slate-300">
-          Power instability threatens every district. Stabilizing shared systems makes the rest of the city easier to recover.
-        </p>
-      </div>
+      {showFirstOrderHint && (
+        <button
+          type="button"
+          data-note="Visible First Order Guide"
+          onClick={acceptFirstOrderHint}
+          className="fixed right-4 top-4 z-[9999] max-w-sm rounded-2xl border border-sky-300/50 bg-slate-900/95 p-4 text-left text-white shadow-2xl backdrop-blur transition hover:border-sky-200 hover:bg-slate-800/95"
+        >
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-sky-300">Recommended First Order</p>
+          <p className="mt-2 text-sm font-black text-white">
+            Start with {recommendedDistrict.icon} {recommendedDistrict.name}.
+          </p>
+          <p className="mt-1 text-xs leading-5 text-slate-300">{recommendedNextMove.reason}</p>
+        </button>
+      )}
 
       <div className="mx-auto max-w-7xl px-4 py-5">
         <header className="mb-3 rounded-3xl border border-slate-800/70 bg-slate-900/70 p-4 shadow-lg">
