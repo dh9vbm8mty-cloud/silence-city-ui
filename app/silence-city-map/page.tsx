@@ -16,6 +16,19 @@ type CityResources = {
 
 type ResourceDelta = Partial<Record<keyof CityResources, number>>;
 
+type CivicDilemmaChoice = {
+  label: string;
+  description: string;
+  delta: ResourceDelta;
+};
+
+type CivicDilemma = {
+  id: string;
+  title: string;
+  situation: string;
+  choices: [CivicDilemmaChoice, CivicDilemmaChoice];
+};
+
 type District = {
   id: string;
   name: string;
@@ -30,7 +43,82 @@ type District = {
   points: string;
 };
 
-const version = "3.2.2";
+const version = "3.4.0";
+
+const civicDilemmas: CivicDilemma[] = [
+  {
+    id: "clinic-power-request",
+    title: "Clinic Power Request",
+    situation:
+      "The Field Clinic requests emergency power. Civic AI warns that redirecting power may delay citywide recovery calculations.",
+    choices: [
+      {
+        label: "Prioritize the clinic",
+        description: "Protect residents now, even if the grid becomes less stable.",
+        delta: { Trust: 1, Power: -1 },
+      },
+      {
+        label: "Protect Civic AI",
+        description: "Preserve coordination capacity, even if residents question the decision.",
+        delta: { Data: 1, Trust: -1 },
+      },
+    ],
+  },
+  {
+    id: "market-ration-dispute",
+    title: "Market Ration Dispute",
+    situation:
+      "Old Market leaders want local supply autonomy. Depot crews warn that uncontrolled distribution may break the citywide ration plan.",
+    choices: [
+      {
+        label: "Allow local distribution",
+        description: "Give neighborhoods more agency, but consume reserves faster.",
+        delta: { Trust: 1, Supplies: -1 },
+      },
+      {
+        label: "Keep central rationing",
+        description: "Protect the stockpile, but increase social frustration.",
+        delta: { Supplies: 1, Trust: -1 },
+      },
+    ],
+  },
+  {
+    id: "archive-access-conflict",
+    title: "Archive Access Conflict",
+    situation:
+      "The Civic Archive found old access records. Residents demand public release; engineers warn that exposure could trigger unrest.",
+    choices: [
+      {
+        label: "Release the records",
+        description: "Restore public confidence, but lose control over sensitive information.",
+        delta: { Trust: 1, Data: -1 },
+      },
+      {
+        label: "Restrict access",
+        description: "Preserve operational records, but deepen public suspicion.",
+        delta: { Data: 1, Trust: -1 },
+      },
+    ],
+  },
+  {
+    id: "gate-labor-shortage",
+    title: "Gate Labor Shortage",
+    situation:
+      "Route Gate repairs need more workers. Residential districts argue that pulling people away will weaken shelter operations.",
+    choices: [
+      {
+        label: "Send workers to Route Gate",
+        description: "Advance reconnection, but strain residential stability.",
+        delta: { Gate: 1, Trust: -1 },
+      },
+      {
+        label: "Keep workers in housing",
+        description: "Protect the shelters and preserve public cooperation.",
+        delta: { Trust: 1 },
+      },
+    ],
+  },
+];
 
 const startingResources: CityResources = {
   Power: 34,
