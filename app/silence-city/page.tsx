@@ -23,6 +23,7 @@ import {
   UserX,
   Users,
   Wrench,
+  type LucideIcon,
 } from "lucide-react";
 
 const roles = {
@@ -175,27 +176,204 @@ const dashboardConnections = [
   { from: "Industrial Ward", to: "Silence City", status: "Delayed" },
 ];
 
-const dashboardDecisionOptions = [
+const initialDashboardCities = [
   {
-    label: "Deploy Law Force",
-    action: "Patrol Route",
-    role: "Security" as RoleName,
-    consequence: "+Legitimacy, -Law Capacity, possible retaliation",
-    Icon: ShieldCheck,
+    name: "Silence City",
+    role: "Council seat / public storage",
+    routeStatus: "Unknown",
+    stats: { supplies: 56, infrastructure: 39, civicOrder: 37, publicTrust: 34 },
   },
   {
-    label: "Negotiate with Local Boss",
-    action: "Broker Supply Deal",
-    role: "Merchant" as RoleName,
-    consequence: "+Supplies, +Underworld Debt, -Legitimacy",
-    Icon: EyeOff,
+    name: "Port District",
+    role: "Cargo yards / water access",
+    routeStatus: "Contested",
+    stats: { supplies: 62, infrastructure: 32, civicOrder: 33, publicTrust: 41 },
   },
   {
-    label: "Delay and support another city",
-    action: "Coordinate Work Crews",
-    role: "Planner" as RoleName,
-    consequence: "+Industrial Infrastructure, -Port Trust",
-    Icon: Clock,
+    name: "Industrial Ward",
+    role: "Repair crews / power relays",
+    routeStatus: "Blocked",
+    stats: { supplies: 36, infrastructure: 51, civicOrder: 35, publicTrust: 47 },
+  },
+];
+
+const initialDashboardMetrics = {
+  publicTrust: 49,
+  lawCapacity: 37,
+  underworldInfluence: 54,
+  publicFear: 60,
+  legitimacy: 45,
+};
+
+type DashboardCityStats = typeof initialDashboardCities[number]["stats"];
+type DashboardMetricState = typeof initialDashboardMetrics;
+type DashboardDecisionOption = {
+  label: string;
+  action: string;
+  role: RoleName;
+  consequence: string;
+  Icon: LucideIcon;
+  cityDeltas: Partial<Record<string, Partial<Record<keyof DashboardCityStats, number>>>>;
+  metricDeltas: Partial<Record<keyof DashboardMetricState, number>>;
+  routeUpdates: Array<{ from: string; to: string; status: string }>;
+};
+
+const dashboardCrises = [
+  {
+    title: "Route Gate convoy seized at the Port locks",
+    source: "Harbor Local Boss / Port District",
+    urgency: "Critical",
+    affected: "Port District",
+    systems: "Supplies / Trust / Law",
+    options: [
+      {
+        label: "Deploy Law Force",
+        action: "Patrol Route",
+        role: "Security" as RoleName,
+        consequence: "+Legitimacy, -Law Capacity, possible retaliation",
+        Icon: ShieldCheck,
+        cityDeltas: { "Port District": { civicOrder: 10, publicTrust: -3 } },
+        metricDeltas: { lawCapacity: -9, underworldInfluence: -5, publicFear: -4, legitimacy: 7 },
+        routeUpdates: [{ from: "Silence City", to: "Port District", status: "Delayed" }],
+      },
+      {
+        label: "Negotiate with Local Boss",
+        action: "Broker Supply Deal",
+        role: "Merchant" as RoleName,
+        consequence: "+Supplies, +Underworld Debt, -Legitimacy",
+        Icon: EyeOff,
+        cityDeltas: { "Port District": { supplies: 12, publicTrust: -6 } },
+        metricDeltas: { publicTrust: -4, underworldInfluence: 9, publicFear: -3, legitimacy: -6 },
+        routeUpdates: [{ from: "Silence City", to: "Port District", status: "Delayed" }],
+      },
+      {
+        label: "Delay and Support Another City",
+        action: "Coordinate Work Crews",
+        role: "Planner" as RoleName,
+        consequence: "+Industrial Infrastructure, -Port Trust",
+        Icon: Clock,
+        cityDeltas: { "Industrial Ward": { infrastructure: 10 }, "Port District": { publicTrust: -7 } },
+        metricDeltas: { lawCapacity: 3, publicTrust: -3, publicFear: 5, legitimacy: -2 },
+        routeUpdates: [{ from: "Port District", to: "Industrial Ward", status: "Unknown" }],
+      },
+    ],
+  },
+  {
+    title: "Shelter generators brown out during water rationing",
+    source: "Shelter Council / Silence City",
+    urgency: "High",
+    affected: "Silence City",
+    systems: "Infrastructure / Public Fear / Trust",
+    options: [
+      {
+        label: "Deploy Law Force",
+        action: "Escort Public Delivery",
+        role: "Security" as RoleName,
+        consequence: "+Civic Order, -Law Capacity, fear contained",
+        Icon: ShieldCheck,
+        cityDeltas: { "Silence City": { civicOrder: 8, publicTrust: 2 } },
+        metricDeltas: { lawCapacity: -7, publicFear: -5, legitimacy: 3 },
+        routeUpdates: [],
+      },
+      {
+        label: "Negotiate with Local Boss",
+        action: "Broker Supply Deal",
+        role: "Merchant" as RoleName,
+        consequence: "+Supplies, +Underworld Influence, -Legitimacy",
+        Icon: EyeOff,
+        cityDeltas: { "Silence City": { supplies: 10, infrastructure: 3 } },
+        metricDeltas: { underworldInfluence: 7, publicFear: -2, legitimacy: -5 },
+        routeUpdates: [],
+      },
+      {
+        label: "Delay and Support Another City",
+        action: "Coordinate Work Crews",
+        role: "Planner" as RoleName,
+        consequence: "+Industrial Infrastructure, -Silence City Trust",
+        Icon: Clock,
+        cityDeltas: { "Industrial Ward": { infrastructure: 8 }, "Silence City": { publicTrust: -8, infrastructure: -4 } },
+        metricDeltas: { publicTrust: -5, publicFear: 6 },
+        routeUpdates: [{ from: "Industrial Ward", to: "Silence City", status: "Delayed" }],
+      },
+    ],
+  },
+  {
+    title: "Industrial relay crews refuse Port repair orders",
+    source: "Crew Delegates / Industrial Ward",
+    urgency: "High",
+    affected: "Industrial Ward",
+    systems: "Infrastructure / Route Gate / Legitimacy",
+    options: [
+      {
+        label: "Deploy Law Force",
+        action: "Patrol Route",
+        role: "Security" as RoleName,
+        consequence: "+Civic Order, -Trust, -Law Capacity",
+        Icon: ShieldCheck,
+        cityDeltas: { "Industrial Ward": { civicOrder: 9, publicTrust: -6 } },
+        metricDeltas: { lawCapacity: -8, publicFear: 3, legitimacy: 2 },
+        routeUpdates: [{ from: "Port District", to: "Industrial Ward", status: "Contested" }],
+      },
+      {
+        label: "Negotiate with Local Boss",
+        action: "Broker Supply Deal",
+        role: "Merchant" as RoleName,
+        consequence: "+Supplies, +Underworld Influence, route delay reduced",
+        Icon: EyeOff,
+        cityDeltas: { "Industrial Ward": { supplies: 8, infrastructure: 4 } },
+        metricDeltas: { underworldInfluence: 6, legitimacy: -4 },
+        routeUpdates: [{ from: "Port District", to: "Industrial Ward", status: "Delayed" }],
+      },
+      {
+        label: "Delay and Support Another City",
+        action: "Coordinate Work Crews",
+        role: "Planner" as RoleName,
+        consequence: "+Silence City Infrastructure, -Industrial Trust",
+        Icon: Clock,
+        cityDeltas: { "Silence City": { infrastructure: 7 }, "Industrial Ward": { publicTrust: -6 } },
+        metricDeltas: { publicTrust: -2, lawCapacity: 2, publicFear: 4 },
+        routeUpdates: [{ from: "Industrial Ward", to: "Silence City", status: "Stable" }],
+      },
+    ],
+  },
+  {
+    title: "Rumor of hidden medicine fractures the ration line",
+    source: "Clinic Archivist / Silence City",
+    urgency: "Medium",
+    affected: "Silence City",
+    systems: "Public Trust / Supplies / Underworld",
+    options: [
+      {
+        label: "Deploy Law Force",
+        action: "Investigate Dispute",
+        role: "Security" as RoleName,
+        consequence: "+Legitimacy, -Law Capacity, fear rises",
+        Icon: ShieldCheck,
+        cityDeltas: { "Silence City": { civicOrder: 7, publicTrust: -2 } },
+        metricDeltas: { lawCapacity: -6, publicFear: 3, legitimacy: 5 },
+        routeUpdates: [],
+      },
+      {
+        label: "Negotiate with Local Boss",
+        action: "Broker Supply Deal",
+        role: "Merchant" as RoleName,
+        consequence: "+Supplies, +Underworld Debt, -Public Trust",
+        Icon: EyeOff,
+        cityDeltas: { "Silence City": { supplies: 9, publicTrust: -5 } },
+        metricDeltas: { publicTrust: -4, underworldInfluence: 8, legitimacy: -4 },
+        routeUpdates: [],
+      },
+      {
+        label: "Delay and Support Another City",
+        action: "Medical Triage",
+        role: "Medicine" as RoleName,
+        consequence: "+Port Trust, -Silence City Supplies",
+        Icon: Clock,
+        cityDeltas: { "Port District": { publicTrust: 7 }, "Silence City": { supplies: -6 } },
+        metricDeltas: { publicTrust: 2, publicFear: 4 },
+        routeUpdates: [{ from: "Silence City", to: "Port District", status: "Stable" }],
+      },
+    ],
   },
 ];
 
@@ -424,6 +602,12 @@ export default function SilenceCityPage() {
   const [selectedWarningStatus, setSelectedWarningStatus] = useState<"all" | "critical" | "warning" | "resolved">("all");
   const [selectedDecisionFrame, setSelectedDecisionFrame] = useState<DecisionFrameName>("Knowledge");
   const [showModeratorData, setShowModeratorData] = useState(false);
+  const [dashboardCityState, setDashboardCityState] = useState(initialDashboardCities);
+  const [dashboardMetricState, setDashboardMetricState] = useState(initialDashboardMetrics);
+  const [dashboardRouteState, setDashboardRouteState] = useState(dashboardConnections);
+  const [activeCrisisIndex, setActiveCrisisIndex] = useState(0);
+  const [selectedDashboardOption, setSelectedDashboardOption] = useState("");
+  const [dashboardLedgerEntries, setDashboardLedgerEntries] = useState(startingActionHistory);
 
   useEffect(() => {
     const savedRecord = window.localStorage.getItem("silence-city-playtest-record-v1");
@@ -611,52 +795,78 @@ export default function SilenceCityPage() {
   const latestCivicEffectText = lastStateChange === "No civic proposal has been resolved yet."
     ? "No civic effect is available yet. Submit and resolve a civic proposal first."
     : lastStateChange;
-  const dashboardCities = [
-    {
-      name: "Silence City",
-      role: "Council seat / public storage",
-      routeStatus: visibleRouteGatePassedCount >= 4 ? "Delayed" : "Unknown",
-      stats: [
-        { label: "Supplies", value: Math.min(100, publicStorage.Scrap * 12 + publicStorage["Structural Part"] * 10), Icon: Package },
-        { label: "Infrastructure", value: districtStats.Infrastructure, Icon: Wrench },
-        { label: "Civic Order", value: districtStats.Security, Icon: Shield },
-        { label: "Public Trust", value: Math.min(100, treasury + certifiedPlayers * 12), Icon: Users },
-      ],
-    },
-    {
-      name: "Port District",
-      role: "Cargo yards / water access",
-      routeStatus: "Contested",
-      stats: [
-        { label: "Supplies", value: 62, Icon: Package },
-        { label: "Infrastructure", value: Math.max(28, districtStats.Infrastructure - 7), Icon: Wrench },
-        { label: "Civic Order", value: Math.max(25, districtStats.Security - 4), Icon: Shield },
-        { label: "Public Trust", value: 41, Icon: Users },
-      ],
-    },
-    {
-      name: "Industrial Ward",
-      role: "Repair crews / power relays",
-      routeStatus: routeGateReady ? "Stable" : "Blocked",
-      stats: [
-        { label: "Supplies", value: Math.min(100, publicStorage["Structural Part"] * 18), Icon: Package },
-        { label: "Infrastructure", value: Math.min(100, districtStats.Infrastructure + 12), Icon: Wrench },
-        { label: "Civic Order", value: Math.max(30, districtStats.Security - 2), Icon: Shield },
-        { label: "Public Trust", value: 47, Icon: Users },
-      ],
-    },
-  ];
+  const activeDashboardCrisis = dashboardCrises[activeCrisisIndex];
+  const dashboardCities = dashboardCityState.map((city) => ({
+    ...city,
+    stats: [
+      { label: "Supplies", value: city.stats.supplies, Icon: Package },
+      { label: "Infrastructure", value: city.stats.infrastructure, Icon: Wrench },
+      { label: "Civic Order", value: city.stats.civicOrder, Icon: Shield },
+      { label: "Public Trust", value: city.stats.publicTrust, Icon: Users },
+    ],
+  }));
+  const dashboardRouteNetworkStatus = dashboardRouteState.some((connection) => connection.status === "Blocked")
+    ? "Unstable"
+    : dashboardRouteState.some((connection) => connection.status === "Contested")
+      ? "Contested"
+      : dashboardRouteState.some((connection) => connection.status === "Delayed")
+        ? "Delayed"
+        : "Stable";
   const dashboardPressureMetrics = [
-    { label: "Public Trust", value: Math.min(100, treasury + certifiedPlayers * 12), status: "Watchful", Icon: Handshake },
-    { label: "Law Capacity", value: districtStats.Security, status: districtStats.Security < 35 ? "Thin" : "Holding", Icon: Scale },
-    { label: "Underworld Influence", value: action === "Broker Supply Deal" ? 63 : 54, status: action === "Broker Supply Deal" ? "Rising" : "Embedded", Icon: EyeOff },
-    { label: "Public Fear", value: criticalWarningCount > 0 ? 72 : activeWarnings.length * 12 + 36, status: criticalWarningCount > 0 ? "High" : "Managed", Icon: AlertCircle },
-    { label: "Legitimacy", value: Math.min(100, treasury + districtStats.Security), status: "Contested", Icon: Landmark },
+    { label: "Public Trust", value: dashboardMetricState.publicTrust, status: dashboardMetricState.publicTrust < 45 ? "Fraying" : "Watchful", Icon: Handshake },
+    { label: "Law Capacity", value: dashboardMetricState.lawCapacity, status: dashboardMetricState.lawCapacity < 35 ? "Thin" : "Holding", Icon: Scale },
+    { label: "Underworld Influence", value: dashboardMetricState.underworldInfluence, status: dashboardMetricState.underworldInfluence > 62 ? "Rising" : "Embedded", Icon: EyeOff },
+    { label: "Public Fear", value: dashboardMetricState.publicFear, status: dashboardMetricState.publicFear > 64 ? "High" : "Managed", Icon: AlertCircle },
+    { label: "Legitimacy", value: dashboardMetricState.legitimacy, status: dashboardMetricState.legitimacy < 45 ? "Contested" : "Credible", Icon: Landmark },
   ];
-  const dashboardLedger = actionHistory.slice(0, 5);
+  const dashboardLedger = dashboardLedgerEntries.slice(0, 5);
 
   function addPlaytestRecord(entry: string) {
     setPlaytestRecord((previous) => [entry, ...previous].slice(0, 20));
+  }
+
+  function applyDashboardDecision(option: DashboardDecisionOption) {
+    const resolvedDay = day;
+    const ledgerEntry = `Day ${String(resolvedDay).padStart(2, "0")} | ${activeDashboardCrisis.title}: ${option.label}. ${option.consequence}.`;
+
+    setSelectedDashboardOption(option.label);
+    setRole(option.role);
+    setAction(option.action);
+    setSubmitted(false);
+    setResolved(false);
+    setLastStateChange(ledgerEntry);
+    setLastResolvedDay(resolvedDay);
+    setLastEndOfDaySummary(`Resolved Day ${resolvedDay}. ${option.label} applied to ${activeDashboardCrisis.affected}.`);
+    setDashboardCityState((previous) => previous.map((city) => {
+      const deltas = option.cityDeltas[city.name];
+      if (!deltas) return city;
+
+      return {
+        ...city,
+        stats: {
+          supplies: clampStat(city.stats.supplies + (deltas.supplies ?? 0)),
+          infrastructure: clampStat(city.stats.infrastructure + (deltas.infrastructure ?? 0)),
+          civicOrder: clampStat(city.stats.civicOrder + (deltas.civicOrder ?? 0)),
+          publicTrust: clampStat(city.stats.publicTrust + (deltas.publicTrust ?? 0)),
+        },
+      };
+    }));
+    setDashboardMetricState((previous) => ({
+      publicTrust: clampStat(previous.publicTrust + (option.metricDeltas.publicTrust ?? 0)),
+      lawCapacity: clampStat(previous.lawCapacity + (option.metricDeltas.lawCapacity ?? 0)),
+      underworldInfluence: clampStat(previous.underworldInfluence + (option.metricDeltas.underworldInfluence ?? 0)),
+      publicFear: clampStat(previous.publicFear + (option.metricDeltas.publicFear ?? 0)),
+      legitimacy: clampStat(previous.legitimacy + (option.metricDeltas.legitimacy ?? 0)),
+    }));
+    setDashboardRouteState((previous) => previous.map((connection) => {
+      const update = option.routeUpdates.find((item) => item.from === connection.from && item.to === connection.to);
+      return update ? { ...connection, status: update.status } : connection;
+    }));
+    setDashboardLedgerEntries((previous) => [ledgerEntry, ...previous].slice(0, 8));
+    setActionHistory((previous) => [ledgerEntry, ...previous].slice(0, 8));
+    addPlaytestRecord(ledgerEntry);
+    setDay((previous) => Math.min(14, previous + 1));
+    setActiveCrisisIndex((previous) => (previous + 1) % dashboardCrises.length);
   }
 
   const playtestSnapshot = {
@@ -1062,6 +1272,12 @@ export default function SilenceCityPage() {
     setSelectedWarningStatus("all");
     setSelectedDecisionFrame("Knowledge");
     setShowModeratorData(false);
+    setDashboardCityState(initialDashboardCities);
+    setDashboardMetricState(initialDashboardMetrics);
+    setDashboardRouteState(dashboardConnections);
+    setActiveCrisisIndex(0);
+    setSelectedDashboardOption("");
+    setDashboardLedgerEntries(startingActionHistory);
     window.localStorage.removeItem("silence-city-playtest-record-v1");
     window.localStorage.removeItem("silence-city-submitted-snapshots-v1");
     setLastStateChange("No civic proposal has been resolved yet.");
@@ -1143,8 +1359,8 @@ export default function SilenceCityPage() {
             </div>
             <div className="grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
               <OpsTopItem label="Day" value={String(day).padStart(2, "0")} />
-              <OpsTopItem label="Route Network" value={routeGateReady ? "Stable" : "Unstable"} />
-              <OpsTopItem label="Civic Risk" value={criticalWarningCount > 0 ? "High" : "Elevated"} warning />
+              <OpsTopItem label="Route Network" value={dashboardRouteNetworkStatus} />
+              <OpsTopItem label="Civic Risk" value={dashboardMetricState.publicFear > 64 ? "High" : "Elevated"} warning />
               <OpsTopItem label="Phase" value={resolved ? "Outcome Review" : "Emergency Response"} />
             </div>
           </div>
@@ -1177,7 +1393,7 @@ export default function SilenceCityPage() {
               </div>
 
               <div className="mt-3 grid gap-2">
-                {dashboardConnections.map((connection) => (
+                {dashboardRouteState.map((connection) => (
                   <div key={`${connection.from}-${connection.to}`} className="flex items-center justify-between gap-2 rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-xs">
                     <span className="flex items-center gap-2 text-slate-300">
                       <GitBranch className="h-4 w-4 text-cyan-200" />
@@ -1194,10 +1410,10 @@ export default function SilenceCityPage() {
             <div className="rounded-2xl border border-amber-300/30 bg-slate-900/80 p-3">
               <OpsPanelTitle icon={<TriangleAlert className="h-4 w-4 text-amber-200" />} title="Daily Crisis" />
               <div className="mt-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-amber-100">Source: Harbor Local Boss / Port District</p>
-                <h3 className="mt-1 text-lg font-bold text-white">Route Gate convoy seized at the Port locks</h3>
+                <p className="text-xs font-bold uppercase tracking-wide text-amber-100">Source: {activeDashboardCrisis.source}</p>
+                <h3 className="mt-1 text-lg font-bold text-white">{activeDashboardCrisis.title}</h3>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                  {["Urgency: Critical", `Affected: ${activeWarnings[0]?.label ?? "Route Gate"}`, "Systems: Supplies / Trust / Law"].map((item) => (
+                  {[`Urgency: ${activeDashboardCrisis.urgency}`, `Affected: ${activeDashboardCrisis.affected}`, `Systems: ${activeDashboardCrisis.systems}`].map((item) => (
                     <span key={item} className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 font-semibold text-slate-200">
                       {item}
                     </span>
@@ -1206,21 +1422,15 @@ export default function SilenceCityPage() {
               </div>
 
               <div className="mt-3 grid gap-2 lg:grid-cols-3">
-                {dashboardDecisionOptions.map((option) => {
+                {activeDashboardCrisis.options.map((option) => {
                   const Icon = option.Icon;
-                  const selected = role === option.role && action === option.action;
+                  const selected = selectedDashboardOption === option.label;
 
                   return (
                     <button
                       key={option.label}
                       type="button"
-                      onClick={() => {
-                        setRole(option.role);
-                        setAction(option.action);
-                        setSubmitted(false);
-                        setResolved(false);
-                        setLastStateChange("Operations dashboard selected a civic response. Review and submit below.");
-                      }}
+                      onClick={() => applyDashboardDecision(option)}
                       className={`rounded-2xl border p-3 text-left transition hover:border-cyan-200/70 ${selected ? "border-cyan-200 bg-cyan-300/10" : "border-slate-800 bg-slate-950/70"}`}
                     >
                       <div className="flex items-center justify-between gap-2">
