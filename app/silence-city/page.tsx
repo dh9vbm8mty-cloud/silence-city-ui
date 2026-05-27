@@ -2,6 +2,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  AlertCircle,
+  BadgeCheck,
+  Building2,
+  Clock,
+  EyeOff,
+  GitBranch,
+  Handshake,
+  Landmark,
+  Link2Off,
+  Package,
+  RadioTower,
+  ReceiptText,
+  Route,
+  Scale,
+  Shield,
+  ShieldCheck,
+  TriangleAlert,
+  UserX,
+  Users,
+  Wrench,
+} from "lucide-react";
 
 const roles = {
   Engineering: {
@@ -147,6 +169,36 @@ const startingActionHistory = [
   "Day 1 — Logistics — Storage Audit — First trusted Public Storage record created.",
 ];
 
+const dashboardConnections = [
+  { from: "Silence City", to: "Port District", status: "Contested" },
+  { from: "Port District", to: "Industrial Ward", status: "Blocked" },
+  { from: "Industrial Ward", to: "Silence City", status: "Delayed" },
+];
+
+const dashboardDecisionOptions = [
+  {
+    label: "Deploy Law Force",
+    action: "Patrol Route",
+    role: "Security" as RoleName,
+    consequence: "+Legitimacy, -Law Capacity, possible retaliation",
+    Icon: ShieldCheck,
+  },
+  {
+    label: "Negotiate with Local Boss",
+    action: "Broker Supply Deal",
+    role: "Merchant" as RoleName,
+    consequence: "+Supplies, +Underworld Debt, -Legitimacy",
+    Icon: EyeOff,
+  },
+  {
+    label: "Delay and support another city",
+    action: "Coordinate Work Crews",
+    role: "Planner" as RoleName,
+    consequence: "+Industrial Infrastructure, -Port Trust",
+    Icon: Clock,
+  },
+];
+
 function getActionEffectPreview(actionName: string) {
   if (actionName === "Stabilize Power") return "Expected: Power +3, Scrap -1, then end-of-day decay applies.";
   if (actionName === "Repair Infrastructure") return "Expected: Infrastructure +3, Scrap -1, then end-of-day decay applies.";
@@ -261,6 +313,23 @@ function getPublicResourceIcon(label: keyof PublicStorage | "Treasury") {
   if (label === "Structural Part") return "🧱";
   if (label === "Treasury") return "🪙";
   return "•";
+}
+
+function getRouteStatusClass(status: string) {
+  if (status === "Stable") return "border-emerald-300/40 bg-emerald-300/10 text-emerald-100";
+  if (status === "Delayed") return "border-amber-300/40 bg-amber-300/10 text-amber-100";
+  if (status === "Blocked") return "border-rose-300/40 bg-rose-300/10 text-rose-100";
+  if (status === "Contested") return "border-orange-300/40 bg-orange-300/10 text-orange-100";
+  return "border-slate-300/30 bg-slate-300/10 text-slate-200";
+}
+
+function getDashboardLedgerIcon(item: string) {
+  if (item.includes("Treasury") || item.includes("Market")) return ReceiptText;
+  if (item.includes("Security") || item.includes("Law")) return Scale;
+  if (item.includes("trust")) return UserX;
+  if (item.includes("Route")) return Link2Off;
+  if (item.includes("Broker")) return EyeOff;
+  return AlertCircle;
 }
 
 function getRouteGateIcon(label: string) {
@@ -542,6 +611,49 @@ export default function SilenceCityPage() {
   const latestCivicEffectText = lastStateChange === "No civic proposal has been resolved yet."
     ? "No civic effect is available yet. Submit and resolve a civic proposal first."
     : lastStateChange;
+  const dashboardCities = [
+    {
+      name: "Silence City",
+      role: "Council seat / public storage",
+      routeStatus: visibleRouteGatePassedCount >= 4 ? "Delayed" : "Unknown",
+      stats: [
+        { label: "Supplies", value: Math.min(100, publicStorage.Scrap * 12 + publicStorage["Structural Part"] * 10), Icon: Package },
+        { label: "Infrastructure", value: districtStats.Infrastructure, Icon: Wrench },
+        { label: "Civic Order", value: districtStats.Security, Icon: Shield },
+        { label: "Public Trust", value: Math.min(100, treasury + certifiedPlayers * 12), Icon: Users },
+      ],
+    },
+    {
+      name: "Port District",
+      role: "Cargo yards / water access",
+      routeStatus: "Contested",
+      stats: [
+        { label: "Supplies", value: 62, Icon: Package },
+        { label: "Infrastructure", value: Math.max(28, districtStats.Infrastructure - 7), Icon: Wrench },
+        { label: "Civic Order", value: Math.max(25, districtStats.Security - 4), Icon: Shield },
+        { label: "Public Trust", value: 41, Icon: Users },
+      ],
+    },
+    {
+      name: "Industrial Ward",
+      role: "Repair crews / power relays",
+      routeStatus: routeGateReady ? "Stable" : "Blocked",
+      stats: [
+        { label: "Supplies", value: Math.min(100, publicStorage["Structural Part"] * 18), Icon: Package },
+        { label: "Infrastructure", value: Math.min(100, districtStats.Infrastructure + 12), Icon: Wrench },
+        { label: "Civic Order", value: Math.max(30, districtStats.Security - 2), Icon: Shield },
+        { label: "Public Trust", value: 47, Icon: Users },
+      ],
+    },
+  ];
+  const dashboardPressureMetrics = [
+    { label: "Public Trust", value: Math.min(100, treasury + certifiedPlayers * 12), status: "Watchful", Icon: Handshake },
+    { label: "Law Capacity", value: districtStats.Security, status: districtStats.Security < 35 ? "Thin" : "Holding", Icon: Scale },
+    { label: "Underworld Influence", value: action === "Broker Supply Deal" ? 63 : 54, status: action === "Broker Supply Deal" ? "Rising" : "Embedded", Icon: EyeOff },
+    { label: "Public Fear", value: criticalWarningCount > 0 ? 72 : activeWarnings.length * 12 + 36, status: criticalWarningCount > 0 ? "High" : "Managed", Icon: AlertCircle },
+    { label: "Legitimacy", value: Math.min(100, treasury + districtStats.Security), status: "Contested", Icon: Landmark },
+  ];
+  const dashboardLedger = actionHistory.slice(0, 5);
 
   function addPlaytestRecord(entry: string) {
     setPlaytestRecord((previous) => [entry, ...previous].slice(0, 20));
@@ -1023,51 +1135,212 @@ export default function SilenceCityPage() {
   return (
     <main className="min-h-screen bg-slate-100 p-6 text-slate-900">
       <div className="mx-auto max-w-7xl space-y-5">
-        <header className="rounded-3xl border bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">
-            Silence City — District Council Interface v1.4.0
-          </p>
-          <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h1 className="text-3xl font-bold">Old Industrial Sector — Day {day} / 14</h1>
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-2xl border bg-white px-4 py-2 text-sm font-semibold text-slate-600">
-                Player View
-              </span>
+        <section className="rounded-3xl border border-slate-700 bg-slate-950 p-4 text-slate-100 shadow-xl">
+          <div className="flex flex-col gap-3 border-b border-slate-800 pb-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-cyan-200">Operations Dashboard v0.2</p>
+              <h2 className="mt-1 text-xl font-bold text-white">Three-city civic pressure board</h2>
+            </div>
+            <div className="grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
+              <OpsTopItem label="Day" value={String(day).padStart(2, "0")} />
+              <OpsTopItem label="Route Network" value={routeGateReady ? "Stable" : "Unstable"} />
+              <OpsTopItem label="Civic Risk" value={criticalWarningCount > 0 ? "High" : "Elevated"} warning />
+              <OpsTopItem label="Phase" value={resolved ? "Outcome Review" : "Emergency Response"} />
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 xl:grid-cols-[1.1fr_1.4fr_1fr]">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
+              <OpsPanelTitle icon={<RadioTower className="h-4 w-4" />} title="City Network" />
+              <div className="mt-3 space-y-3">
+                {dashboardCities.map((city) => (
+                  <article key={city.name} className="rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2">
+                        <Building2 className="mt-0.5 h-5 w-5 text-cyan-200" />
+                        <div>
+                          <p className="font-bold text-white">{city.name}</p>
+                          <p className="text-xs text-slate-400">{city.role}</p>
+                        </div>
+                      </div>
+                      <span className={`rounded-full border px-2 py-1 text-xs font-bold ${getRouteStatusClass(city.routeStatus)}`}>
+                        {city.routeStatus}
+                      </span>
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {city.stats.map((stat) => (
+                        <OpsMetric key={`${city.name}-${stat.label}`} {...stat} />
+                      ))}
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className="mt-3 grid gap-2">
+                {dashboardConnections.map((connection) => (
+                  <div key={`${connection.from}-${connection.to}`} className="flex items-center justify-between gap-2 rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-xs">
+                    <span className="flex items-center gap-2 text-slate-300">
+                      <GitBranch className="h-4 w-4 text-cyan-200" />
+                      {connection.from} → {connection.to}
+                    </span>
+                    <span className={`rounded-full border px-2 py-1 font-bold ${getRouteStatusClass(connection.status)}`}>
+                      {connection.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-amber-300/30 bg-slate-900/80 p-3">
+              <OpsPanelTitle icon={<TriangleAlert className="h-4 w-4 text-amber-200" />} title="Daily Crisis" />
+              <div className="mt-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-amber-100">Source: Harbor Local Boss / Port District</p>
+                <h3 className="mt-1 text-lg font-bold text-white">Route Gate convoy seized at the Port locks</h3>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                  {["Urgency: Critical", `Affected: ${activeWarnings[0]?.label ?? "Route Gate"}`, "Systems: Supplies / Trust / Law"].map((item) => (
+                    <span key={item} className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 font-semibold text-slate-200">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3 grid gap-2 lg:grid-cols-3">
+                {dashboardDecisionOptions.map((option) => {
+                  const Icon = option.Icon;
+                  const selected = role === option.role && action === option.action;
+
+                  return (
+                    <button
+                      key={option.label}
+                      type="button"
+                      onClick={() => {
+                        setRole(option.role);
+                        setAction(option.action);
+                        setSubmitted(false);
+                        setResolved(false);
+                        setLastStateChange("Operations dashboard selected a civic response. Review and submit below.");
+                      }}
+                      className={`rounded-2xl border p-3 text-left transition hover:border-cyan-200/70 ${selected ? "border-cyan-200 bg-cyan-300/10" : "border-slate-800 bg-slate-950/70"}`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <Icon className="h-5 w-5 text-cyan-200" />
+                        {selected && <BadgeCheck className="h-4 w-4 text-emerald-200" />}
+                      </div>
+                      <p className="mt-2 text-sm font-bold text-white">{option.label}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-400">{option.consequence}</p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-3 rounded-2xl border border-slate-800 bg-slate-950/70 p-3">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Current Order</p>
+                    <p className="mt-1 text-sm font-semibold text-white">{role} / {action}</p>
+                    <p className="mt-1 text-xs text-slate-400">{proposalNextStep}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitted(true);
+                        setResolved(false);
+                        setLastStateChange("Civic proposal submitted. Resolve today’s outcome when ready.");
+                      }}
+                      className="rounded-xl border border-cyan-200/50 bg-cyan-200 px-3 py-2 text-xs font-bold text-slate-950 hover:bg-cyan-100"
+                    >
+                      Submit Decision
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resolveDay}
+                      disabled={!submitted || resolved}
+                      className="rounded-xl border border-amber-200/50 bg-amber-200 px-3 py-2 text-xs font-bold text-slate-950 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      End Day
+                    </button>
+                    <button
+                      type="button"
+                      onClick={continueToNextDay}
+                      disabled={!resolved}
+                      className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-slate-100 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Next Day
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetScenario}
+                      className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-slate-100 hover:bg-slate-800"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
+              <OpsPanelTitle icon={<Landmark className="h-4 w-4" />} title="Power Balance" />
+              <div className="mt-3 space-y-2">
+                {dashboardPressureMetrics.map((metric) => (
+                  <OpsMetric key={metric.label} {...metric} inverse={metric.label === "Underworld Influence" || metric.label === "Public Fear"} />
+                ))}
+              </div>
+              <div className="mt-3 rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-xs leading-5 text-slate-400">
+                <p className="font-bold text-slate-200">Law Force vs Underworld</p>
+                <p>Visible order improves legitimacy, while underworld deals move scarce supplies at a future civic cost.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
+            <OpsPanelTitle icon={<ReceiptText className="h-4 w-4" />} title="Consequence Ledger" />
+            <div className="mt-3 grid gap-2 lg:grid-cols-5">
+              {dashboardLedger.map((item) => {
+                const LedgerIcon = getDashboardLedgerIcon(item);
+
+                return (
+                  <div key={item} className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-xs leading-5 text-slate-300">
+                    <LedgerIcon className="mb-2 h-4 w-4 text-cyan-200" />
+                    {item}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-800 pt-3">
               <button
-                onClick={resetScenario}
-                className="rounded-2xl border bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                type="button"
+                onClick={() => copyTextToClipboard(playtestRecord.join("\n"), "Playtest log copied.")}
+                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-bold text-slate-100 hover:bg-slate-900"
               >
-                Reset Scenario
+                Copy Log
               </button>
+              <button
+                type="button"
+                onClick={downloadJsonSnapshot}
+                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-bold text-slate-100 hover:bg-slate-900"
+              >
+                Export JSON
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitSnapshotToLocalQueue("manual")}
+                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-bold text-slate-100 hover:bg-slate-900"
+              >
+                Submit Snapshot
+              </button>
+              <p className="text-xs text-slate-500">{copyStatus}</p>
             </div>
           </div>
-          <p className="mt-2 text-slate-600">
-            Zone Condition: Functional but weak · Market and Treasury systems are becoming available
-          </p>
+        </section>
 
-          <div className="mt-4 rounded-2xl border bg-slate-50 p-3">
-            <div className="flex items-center justify-between text-sm">
-              <p className="font-bold text-slate-700">Campaign Clock</p>
-              <p className="font-semibold text-slate-600">Day {day} / 14 · {dayProgress}%</p>
-            </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
-              <div
-                className="h-full rounded-full bg-slate-900 transition-all"
-                style={{ width: `${dayProgress}%` }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-slate-500">
-              Each resolved civic outcome advances the 14-day district test.
-            </p>
-          </div>
-
-          <div className="mt-3 inline-flex flex-col rounded-2xl border bg-white/80 px-3 py-2 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{screenLabel}</p>
-            <p className="text-sm font-semibold text-slate-800">{screenHint}</p>
-          </div>
-        </header>
-
-        
+        <details className="rounded-3xl border border-slate-300 bg-white/80 p-4 shadow-sm">
+          <summary className="cursor-pointer text-sm font-bold uppercase tracking-wide text-slate-700">
+            Legacy Debug Panel
+          </summary>
+          <div className="mt-4 space-y-5">
 
         {viewMode === "player" && !resolved && (
           <section className="rounded-3xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-slate-50 p-4 shadow-sm">
@@ -1516,6 +1789,8 @@ export default function SilenceCityPage() {
             </div>
           </div>
         </section>
+          </div>
+        </details>
       </div>
     </main>
   );
@@ -1527,6 +1802,59 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
       <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-700">{title}</h2>
       {children}
     </section>
+  );
+}
+
+function OpsTopItem({ label, value, warning = false }: { label: string; value: string; warning?: boolean }) {
+  return (
+    <div className="rounded-xl border border-slate-800 bg-slate-900 px-3 py-2">
+      <p className="font-bold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className={`mt-1 font-bold ${warning ? "text-amber-100" : "text-slate-100"}`}>{value}</p>
+    </div>
+  );
+}
+
+function OpsPanelTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-300">
+      <span className="text-cyan-200">{icon}</span>
+      {title}
+    </div>
+  );
+}
+
+function OpsMetric({
+  label,
+  value,
+  status,
+  Icon,
+  inverse = false,
+}: {
+  label: string;
+  value: number;
+  status?: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  inverse?: boolean;
+}) {
+  const clampedValue = Math.max(0, Math.min(100, value));
+  const danger = inverse ? clampedValue > 62 : clampedValue < 38;
+  const caution = inverse ? clampedValue > 48 : clampedValue < 55;
+  const barClass = danger ? "bg-rose-400" : caution ? "bg-amber-300" : "bg-emerald-300";
+
+  return (
+    <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-slate-300">
+          <Icon className="h-3.5 w-3.5 shrink-0 text-cyan-200" />
+          <span className="truncate">{label}</span>
+        </span>
+        <span className="text-xs font-bold text-white">{clampedValue}</span>
+      </div>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800">
+        <div className={`h-full rounded-full ${barClass}`} style={{ width: `${clampedValue}%` }} />
+      </div>
+      {status && <p className="mt-1 text-xs text-slate-500">{status}</p>}
+    </div>
   );
 }
 
